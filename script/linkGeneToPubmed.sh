@@ -7,3 +7,5 @@ parallel --jobs 1 \
     | efetch -format uid \
     | sort -n > data/pubmed/{= s/.*(?=.)// =}/{}.pmid" \
     :::: data/geneList.txt
+
+cat data/pubmed/*/*.pmid | sort -nu > data/pubmed/gene.pmid
