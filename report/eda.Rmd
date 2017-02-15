@@ -12,92 +12,91 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(lubridate)
+
+gene_pubmed <- read_rds("../data/summary/gene_pubmed.rds")
 ```
 
 # Overall gene trend
-```{r}
-pubmed_date <- read_tsv("../data/pubmedDate.txt",
-                        col_names = c("pmid", "date"),
-                        col_types = "iD")
-dat.year = table(year(pubmed_date$date))
-dat.year = dat.year[dat.year > 99]
 
-plot(dat.year, ylab = "")
+```{r}
+dat.year = gene_pubmed %>%
+    mutate(year = year(date)) %>%
+    select(pmid, year) %>%
+    group_by(year) %>%
+    mutate(uniq = !duplicated(pmid)) %>%
+    filter(n_distinct(pmid) > 99)
+
+ggplot(dat.year,
+       aes(x = year, fill = uniq)) +
+    geom_bar() +
+    theme_bw()
 ```
 
 # Hottest genes
-```{r}
-gene_pubmed = read_tsv("../data/geneToPubmed.txt",
-                       col_names = c("gid", "pmid"),
-                       col_types = "ii")
-gene_pubmed = left_join(gene_pubmed, pubmed_date,
-                        by = "pmid")
-
-gene_pubmed_all = gene_pubmed %>%
-    mutate(year = year(date)) %>%
-    group_by(gid) %>%
-    summarise(count = n()) %>%
-    mutate(rank = dense_rank(desc(count))) %>%
-    arrange(desc(count))
-```
 
 ```{r}
-ggplot(gene_pubmed_all %>% top_n(10, count),
-       aes(x = reorder(as.character(gid), count),
+plot_gene_trend <- function(ntop, year_ = NULL, pmid_ = NULL) {
+    if (is.numeric(pmid_)) {
+        dat = gene_pubmed %>%
+            filter(pmid %in% pmid_)
+    } else {
+        dat = gene_pubmed
+    }
+    
+    if (is.null(year_)) {
+        dat = dat %>%
+            mutate(year = year(date)) %>%
+            group_by(gid, gname) %>%
+            summarise(count = n()) %>%
+            ungroup() %>%
+            mutate(rank = min_rank(desc(count))) %>%
+            arrange(desc(count))
+    } else {
+        dat = dat %>%
+            mutate(year = year(date)) %>%
+            group_by(gid, gname, year) %>%
+            summarise(count = n()) %>%
+            filter(year == year_) %>%
+            ungroup() %>%
+            select(-year) %>%
+            mutate(rank = min_rank(desc(count)))
+    }
+    
+    dat = dat %>% top_n(ntop, count)
+    
+    ggplot(dat,
+           aes(x = reorder(gname, count),
            y = count,
            fill = count)) +
-  geom_bar(stat = 'identity') + 
-  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
-    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
-  labs(x = 'Entrez Gene ID') +
-  coord_flip() + 
-  theme_bw()
+    geom_bar(stat = 'identity') + 
+    geom_text(aes(x = gname, y = 0.5, label = rank),
+        hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
+    labs(x = 'Gene symbol') +
+    coord_flip() + 
+    theme_bw()
+}
 ```
 
-
 ```{r}
-gene_pubmed_byYear = gene_pubmed %>%
-    mutate(year = year(date)) %>%
-    group_by(gid, year) %>%
-    summarise(count = n())
+plot_gene_trend(20)
 ```
 
 ## 2015
 
 ```{r}
-ggplot(gene_pubmed_byYear %>%
-           filter(year == 2015) %>%
-           ungroup() %>%
-           select(-year) %>%
-           mutate(rank = dense_rank(desc(count))) %>%
-           top_n(10, count),
-       aes(x = reorder(as.character(gid), count),
-           y = count,
-           fill = count)) +
-  geom_bar(stat = 'identity') + 
-  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
-    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
-  labs(x = 'Entrez Gene ID') +
-  coord_flip() + 
-  theme_bw()
+plot_gene_trend(20, 2015)
 ```
 
 ## 2016
 
 ```{r}
-ggplot(gene_pubmed_byYear %>%
-           filter(year == 2016) %>%
-           ungroup() %>%
-           select(-year) %>%
-           mutate(rank = dense_rank(desc(count))) %>%
-           top_n(10, count),
-       aes(x = reorder(as.character(gid), count),
-           y = count,
-           fill = count)) +
-  geom_bar(stat = 'identity') + 
-  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
-    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
-  labs(x = 'Entrez Gene ID') +
-  coord_flip() + 
-  theme_bw()
+plot_gene_trend(20, 2016)
 ```
+
+## Dendritic Cell
+
+```{r}
+dc.pmid <- as.numeric(readLines('../data/pubmed/dc.pmid'))
+plot_gene_trend(20, pmid_ = dc.pmid)
+```
+
