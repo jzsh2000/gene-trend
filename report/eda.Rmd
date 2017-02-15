@@ -13,7 +13,12 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(lubridate)
 
-gene_pubmed <- read_rds("../data/9606/summary/gene_pubmed.rds")
+if (Sys.getenv("gene_pubmed") == "") {
+    gene_pubmed <- read_rds("../data/9606/summary/gene_pubmed.rds")
+} else {
+    gene_pubmed <- read_rds(Sys.getenv("gene_pubmed"))
+}
+
 ```
 
 # Overall gene trend
