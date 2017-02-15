@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(lubridate)
 
-gene_pubmed <- read_rds("../data/summary/gene_pubmed.rds")
+gene_pubmed <- read_rds("../data/9606/summary/gene_pubmed.rds")
 ```
 
 # Overall gene trend
@@ -96,7 +96,7 @@ plot_gene_trend(20, 2016)
 ## Dendritic Cell
 
 ```{r}
-dc.pmid <- as.numeric(readLines('../data/pubmed/dc.pmid'))
+dc.pmid <- as.numeric(readLines('../data/dc.pmid'))
 plot_gene_trend(20, pmid_ = dc.pmid)
 ```
 
