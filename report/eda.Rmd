@@ -1,0 +1,103 @@
+---
+title: "exploratory data analysis"
+author: "Xiaoyang Jin"
+date: "2017-2-10"
+output:
+    html_document:
+        toc: TRUE
+        theme: "lumen"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(lubridate)
+```
+
+# Overall gene trend
+```{r}
+pubmed_date <- read_tsv("../data/pubmedDate.txt",
+                        col_names = c("pmid", "date"),
+                        col_types = "iD")
+dat.year = table(year(pubmed_date$date))
+dat.year = dat.year[dat.year > 99]
+
+plot(dat.year, ylab = "")
+```
+
+# Hottest genes
+```{r}
+gene_pubmed = read_tsv("../data/geneToPubmed.txt",
+                       col_names = c("gid", "pmid"),
+                       col_types = "ii")
+gene_pubmed = left_join(gene_pubmed, pubmed_date,
+                        by = "pmid")
+
+gene_pubmed_all = gene_pubmed %>%
+    mutate(year = year(date)) %>%
+    group_by(gid) %>%
+    summarise(count = n()) %>%
+    mutate(rank = dense_rank(desc(count))) %>%
+    arrange(desc(count))
+```
+
+```{r}
+ggplot(gene_pubmed_all %>% top_n(10, count),
+       aes(x = reorder(as.character(gid), count),
+           y = count,
+           fill = count)) +
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
+    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
+  labs(x = 'Entrez Gene ID') +
+  coord_flip() + 
+  theme_bw()
+```
+
+
+```{r}
+gene_pubmed_byYear = gene_pubmed %>%
+    mutate(year = year(date)) %>%
+    group_by(gid, year) %>%
+    summarise(count = n())
+```
+
+## 2015
+
+```{r}
+ggplot(gene_pubmed_byYear %>%
+           filter(year == 2015) %>%
+           ungroup() %>%
+           select(-year) %>%
+           mutate(rank = dense_rank(desc(count))) %>%
+           top_n(10, count),
+       aes(x = reorder(as.character(gid), count),
+           y = count,
+           fill = count)) +
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
+    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
+  labs(x = 'Entrez Gene ID') +
+  coord_flip() + 
+  theme_bw()
+```
+
+## 2016
+
+```{r}
+ggplot(gene_pubmed_byYear %>%
+           filter(year == 2016) %>%
+           ungroup() %>%
+           select(-year) %>%
+           mutate(rank = dense_rank(desc(count))) %>%
+           top_n(10, count),
+       aes(x = reorder(as.character(gid), count),
+           y = count,
+           fill = count)) +
+  geom_bar(stat = 'identity') + 
+  geom_text(aes(x = as.character(gid), y = 0.5, label = rank),
+    hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
+  labs(x = 'Entrez Gene ID') +
+  coord_flip() + 
+  theme_bw()
+```
