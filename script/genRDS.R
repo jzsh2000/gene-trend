@@ -3,7 +3,8 @@
 library(tidyverse)
 library(lubridate)
 
-setwd("data/summary")
+txid = commandArgs(TRUE)
+setwd(file.path("data", txid, "summary"))
 
 # ===== read data
 pubmed_date <- read_tsv("pubmedDate.txt",

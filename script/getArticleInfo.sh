@@ -8,10 +8,11 @@
 # * data accepted
 # * author information
 
-cat data/pubmed/gene.pmid | parallel -N 1000 echo | tr ' ' ',' \
+[ $# -eq 0 ] && txid=9606 || txid=$1
+cat data/$txid/pubmed/gene.pmid | parallel -N 1000 echo | tr ' ' ',' \
     | parallel -j1 efetch -db pubmed -id {} -format medline \
-    | tee -a data/pubmed/gene.pmid.dat \
-    | grep -oP '(?<=^EDAT- )[^ ]*' > data/pubmed/gene.pmdate
+    | tee -a data/$txid/pubmed/gene.pmid.dat \
+    | grep -oP '(?<=^EDAT- )[^ ]*' > data/$txid/pubmed/gene.pmdate
 
-gzip data/pubmed/gene.pmid.dat
-mv data/pubmed/gene.pmid.dat.gz data/archives/
+gzip data/$txid/pubmed/gene.pmid.dat
+mv data/$txid/pubmed/gene.pmid.dat.gz data/$txid/archives/

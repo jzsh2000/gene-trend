@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
-esearch -db gene -query "9606[Taxonomy ID] AND alive[prop]" \
+[ $# -eq 0 ] && txid=9606 || txid=$1
+mkdir -p data/$txid/{archives,gene,pubmed,summary}
+
+esearch -db gene -query "$txid[Taxonomy ID] AND alive[prop]" \
     | efetch -format uid \
-    | sort -n > data/gene/geneList.txt
+    | sort -n > data/$txid/gene/geneList.txt
