@@ -6,6 +6,6 @@ parallel --jobs 1 \
     | elink -target pubmed \
     | efetch -format uid \
     | sort -n > data/pubmed/{= s/.*(?=.)// =}/{}.pmid" \
-    :::: data/geneList.txt
+    :::: data/gene/geneList.txt
 
 cat data/pubmed/*/*.pmid | sort -nu > data/pubmed/gene.pmid

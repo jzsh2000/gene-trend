@@ -8,10 +8,10 @@
 # * data accepted
 # * author information
 
-> data/pubmed/gene.pmid.dat
-> data/pubmed/gene.pmdate
-
 cat data/pubmed/gene.pmid | parallel -N 1000 echo | tr ' ' ',' \
     | parallel -j1 efetch -db pubmed -id {} -format medline \
     | tee -a data/pubmed/gene.pmid.dat \
     | grep -oP '(?<=^EDAT- )[^ ]*' > data/pubmed/gene.pmdate
+
+gzip data/pubmed/gene.pmid.dat
+mv data/pubmed/gene.pmid.dat.gz data/archives/

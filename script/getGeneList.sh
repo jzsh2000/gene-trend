@@ -2,4 +2,4 @@
 
 esearch -db gene -query "9606[Taxonomy ID] AND alive[prop]" \
     | efetch -format uid \
-    | sort -n > data/geneList.txt
+    | sort -n > data/gene/geneList.txt
