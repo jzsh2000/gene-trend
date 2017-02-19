@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[ $# -eq 0 ] && txid=9606 || txid=$1
+txid=${1:-9606}
 cat data/$txid/gene/geneList.txt | parallel -N 1000 echo | tr ' ' ',' \
     | parallel -j1 efetch -db gene -id {} -format native \
     | tee -a data/$txid/geneList.dat \

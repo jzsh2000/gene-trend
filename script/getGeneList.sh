@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[ $# -eq 0 ] && txid=9606 || txid=$1
+txid=${1:-9606}
 mkdir -p data/$txid/{archives,gene,pubmed,summary}
 
 esearch -db gene -query "$txid[Taxonomy ID] AND alive[prop]" \

@@ -8,7 +8,7 @@
 # * data accepted
 # * author information
 
-[ $# -eq 0 ] && txid=9606 || txid=$1
+txid=${1:-9606}
 cat data/$txid/pubmed/gene.pmid | parallel -N 1000 echo | tr ' ' ',' \
     | parallel -j1 efetch -db pubmed -id {} -format medline \
     | tee -a data/$txid/pubmed/gene.pmid.dat \
