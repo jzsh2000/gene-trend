@@ -47,7 +47,7 @@ plot_gene_trend <- function(ntop, year_ = NULL, pmid_ = NULL) {
     } else {
         dat = gene_pubmed
     }
-    
+
     if (is.null(year_)) {
         dat = dat %>%
             mutate(year = year(date)) %>%
@@ -66,18 +66,18 @@ plot_gene_trend <- function(ntop, year_ = NULL, pmid_ = NULL) {
             select(-year) %>%
             mutate(rank = min_rank(desc(count)))
     }
-    
+
     dat = dat %>% top_n(ntop, count)
-    
+
     ggplot(dat,
            aes(x = reorder(gname, count),
            y = count,
            fill = count)) +
-    geom_bar(stat = 'identity') + 
+    geom_bar(stat = 'identity') +
     geom_text(aes(x = gname, y = 0.5, label = rank),
         hjust = 0, vjust = 0.55, size = 4, colour = 'red') +
     labs(x = 'Gene symbol') +
-    coord_flip() + 
+    coord_flip() +
     theme_bw()
 }
 ```
