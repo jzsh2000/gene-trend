@@ -31,4 +31,4 @@ efetch-pubmed:
 	bash ./script/efetch-pubmed.sh ${outdir}
 
 clean:
-	rm -r ${outdir}
+	rm -ir ${outdir}
