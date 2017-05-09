@@ -19,7 +19,7 @@ do
     if [ "${pmid_date}" == "" ]; then
         echo -e "${pmid}\tNA" | tee -a ${outdir}/pmid.info2
         ne=$[${ne}+1]
-        if [ $ne -eq 3 ]; then
+        if [ $ne -eq 5 ]; then
             break
         fi
     else
