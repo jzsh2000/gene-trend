@@ -8,10 +8,9 @@ order <- data_frame(
     GeneID = order,
     order = seq(length(order))
 )
-gene_info <- read_tsv("data/current/gene_info.gz") %>%
-    filter(`#tax_id` == 9606) %>%
+gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     select(-1) %>%
-    left_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
+    inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
     arrange(order) %>%
     group_by(Symbol) %>%
     slice(1) %>%
@@ -47,10 +46,9 @@ order <- data_frame(
     GeneID = order,
     order = seq(length(order))
 )
-gene_info <- read_tsv("data/current/gene_info.gz") %>%
-    filter(`#tax_id` == 10090) %>%
+gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     select(-1) %>%
-    left_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
+    inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
     arrange(order) %>%
     group_by(Symbol) %>%
     slice(1) %>%

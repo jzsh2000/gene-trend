@@ -9,7 +9,7 @@ ifneq ($(wildcard ${outdir}/.),)
 update:
 	@echo "Already up-to-date."
 else
-update: download efetch-taxonomy efetch-pubmed relink
+update: download efetch-taxonomy efetch-pubmed relink somework
 endif
 
 download:
@@ -33,6 +33,9 @@ efetch-pubmed:
 relink:
 	find data -type f -name current -delete
 	cd data/; ln -s ${date} current
+
+somework:
+	bash ./script/split-gene-info.sh
 
 clean:
 	rm -ir ${outdir}
