@@ -71,7 +71,9 @@ shinyServer(function(input, output) {
         search.res %>%
             left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
             arrange(order) %>%
-            select(name, type, GeneID, map_location, description)
+            select(name, type, Symbol, description, map_location, GeneID) %>%
+            mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
+            select(-GeneID)
 
-    })
+    }, escape = FALSE)
 })
