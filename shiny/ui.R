@@ -3,31 +3,41 @@
 # run the application by clicking 'Run App' above.
 #
 # Find out more about building applications with Shiny here:
-# 
+#
 #    http://shiny.rstudio.com/
 #
 
 library(shiny)
+library(DT)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-  
+
   # Application title
-  titlePanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins 
+  titlePanel("Gene ID conversion"),
+
+  # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
+        radioButtons(
+            inputId = 'species',
+            label = 'Species',
+            choices = setNames(c('auto', 'human', 'mouse'),
+                               c("Auto detect",
+                                 "Homo sapiens",
+                                 "Mus musculus")),
+            selected = "auto"
+        ),
+        textAreaInput(
+            inputId = 'gene',
+            label = "Gene List",
+            height = '300px'
+        )
     ),
-    
+
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+        dataTableOutput("gene_table")
     )
   )
 ))
