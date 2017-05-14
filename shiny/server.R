@@ -19,29 +19,42 @@ shinyServer(function(input, output) {
     get_gene_list <- reactive({
         gene_list = str_split(input$gene, '\\n')[[1]] %>%
             map_chr(str_trim)
+
+        # remove empty stings
         str_subset(gene_list, '.')
     }) %>% debounce(2000)
 
-    output$gene_table = renderDataTable({
-        gene_list = get_gene_list()
-        if (length(gene_list) == 0) {
-            return(as_data_frame(iris))
-        }
-
+    get_species <- reactive({
         if (input$species == 'auto') {
-            match.human = sum(tolower(gene_list) %in%
-                                  tolower(ids[['human']]))
-            match.mouse = sum(tolower(gene_list) %in%
-                                  tolower(ids[['mouse']]))
-            species = ifelse(match.human >= match.mouse,
-                             'human', 'mouse')
-            print(paste('Use species:', species))
+            gene_list = get_gene_list()
+            if (length(gene_list) == 0) {
+                species = 'auto'
+            } else {
+                match.human = sum(tolower(gene_list) %in%
+                                      tolower(ids[['human']]))
+                match.mouse = sum(tolower(gene_list) %in%
+                                      tolower(ids[['mouse']]))
+                species = ifelse(match.human >= match.mouse,
+                                 'human', 'mouse')
+                print(paste('Use species:', species))
+            }
         } else {
             species = input$species
         }
+        species
+    })
 
-        load(file.path('robj',
-                       paste0(species, '.RData')))
+    output$gene_table = renderDataTable({
+        gene_list = get_gene_list()
+        species = get_species()
+
+        if (length(gene_list) == 0) {
+            return(tribble(~name, ~type, ~Symbol,
+                           ~description, ~map_location, ~GeneID))
+        }
+
+        print(paste('Load RData of', species))
+        load(file.path('robj', paste0(species, '.RData')))
 
         search.res = bind_rows(
             gene_info %>%
@@ -57,15 +70,17 @@ shinyServer(function(input, output) {
                 filter(Synonym %in% gene_list) %>%
                 rename(name = Synonym) %>%
                 mutate(type = 'synonym'),
-            ensembl2id %>%
-                filter(Ensembl %in% gene_list) %>%
-                rename(name = Ensembl) %>%
-                mutate(type = 'ensembl id'),
-            data_frame(
-                name = setdiff(gene_list, ids[[species]])
-            ) %>%
-                mutate(GeneID = NA_integer_,
-                       type = 'unmatched')
+            # 'ENSG00000000003.14' should be treated as 'ENSG00000000003'
+            data_frame(name = gene_list,
+                       gene = str_extract(gene_list, '^[^.]*')) %>%
+                inner_join(ensembl2id, by = c("gene" = "Ensembl")) %>%
+                select(name, GeneID) %>%
+                mutate(type = 'ensembl id')
+            # data_frame(
+            #     name = setdiff(gene_list, ids[[species]])
+            # ) %>%
+            #     mutate(GeneID = NA_integer_,
+            #            type = 'unmatched')
         )
 
         search.res %>%
