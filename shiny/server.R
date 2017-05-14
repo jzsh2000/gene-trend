@@ -37,26 +37,38 @@ shinyServer(function(input, output) {
                 species = ifelse(match.human >= match.mouse,
                                  'human', 'mouse')
                 print(paste('Use species:', species))
+                print(paste('Load RData of', species))
+                load(file.path('robj', paste0(species, '.RData')))
             }
         } else {
             species = input$species
+            print(paste('Load RData of', species))
+            load(file.path('robj', paste0(species, '.RData')))
         }
-        species
+        return(list(
+            species = species,
+            gene_info = gene_info,
+            symbol2id = symbol2id,
+            synonym2id = synonym2id,
+            ensembl2id = ensembl2id
+            ))
     })
 
-    output$gene_table = renderDataTable({
+    get_search_result <- reactive({
+        # three columns:
+        # name | GeneID | type
         gene_list = get_gene_list()
-        species = get_species()
+        species = get_species()[['species']]
+        gene_info = get_species()[['gene_info']]
+        symbol2id = get_species()[['symbol2id']]
+        synonym2id = get_species()[['synonym2id']]
+        ensembl2id = get_species()[['ensembl2id']]
 
         if (length(gene_list) == 0) {
-            return(tribble(~name, ~type, ~Symbol,
-                           ~description, ~map_location, ~GeneID))
+            return(tribble(~name, ~GeneID, ~type))
         }
 
-        print(paste('Load RData of', species))
-        load(file.path('robj', paste0(species, '.RData')))
-
-        search.res = bind_rows(
+        bind_rows(
             gene_info %>%
                 filter(GeneID %in% gene_list) %>%
                 mutate(name = as.character(GeneID)) %>%
@@ -82,7 +94,11 @@ shinyServer(function(input, output) {
             #     mutate(GeneID = NA_integer_,
             #            type = 'unmatched')
         )
+    })
 
+    output$gene_table = renderDataTable({
+        search.res = get_search_result()
+        gene_info = get_species()[['gene_info']]
         search.res %>%
             left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
             arrange(order) %>%
@@ -91,4 +107,10 @@ shinyServer(function(input, output) {
             select(-GeneID)
 
     }, escape = FALSE)
+
+    output$unmatched <- renderText({
+        gene_list = get_gene_list()
+        search.res = get_search_result()
+        setdiff(gene_list, search.res$name)
+    })
 })
