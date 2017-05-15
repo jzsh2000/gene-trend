@@ -1,3 +1,4 @@
 /webpage/
 *.swp
 .Rhistory
+.RData
