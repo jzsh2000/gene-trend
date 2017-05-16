@@ -29,6 +29,14 @@ shinyServer(function(input, output) {
             gene_list = get_gene_list()
             if (length(gene_list) == 0) {
                 species = 'auto'
+                return(list(
+                    species = NA_character_,
+                    gene_info = tribble(~GeneID, ~Symbol, ~description,
+                                        ~map_location),
+                    symbol2id = data_frame(),
+                    synonym2id = data_frame(),
+                    ensembl2id = data_frame()
+                ))
             } else {
                 match.human = sum(tolower(gene_list) %in%
                                       tolower(ids[['human']]))
