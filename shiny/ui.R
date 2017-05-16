@@ -28,6 +28,11 @@ shinyUI(fluidPage(
                                  "Mus musculus")),
             selected = "auto"
         ),
+        fileInput(
+            inputId = 'gene_list_file',
+            label = 'Upload gene list',
+            accept = 'text/plain'
+        ),
         textAreaInput(
             inputId = 'gene',
             label = "Gene List",
@@ -37,6 +42,7 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
     mainPanel(
+        verbatimTextOutput('gene_list_summary'),
         tabsetPanel(
             id = 'output_panel',
             type = 'pills',
