@@ -15,7 +15,7 @@ library(stringr)
 ids = read_rds('robj/id.rds')
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     get_gene_list <- reactive({
         gene_list = str_split(input$gene, '\\n')[[1]] %>%
             map_chr(str_trim)
@@ -45,6 +45,7 @@ shinyServer(function(input, output) {
                 species = ifelse(match.human >= match.mouse,
                                  'human', 'mouse')
                 print(paste('Use species:', species))
+                updateRadioButtons(session, "species", selected = species)
                 print(paste('Load RData of', species))
                 load(file.path('robj', paste0(species, '.RData')))
             }
