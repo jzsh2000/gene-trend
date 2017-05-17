@@ -25,35 +25,9 @@ shinyServer(function(input, output, session) {
     }) %>% debounce(2000)
 
     get_species <- reactive({
-        if (input$species == 'auto') {
-            gene_list = get_gene_list()
-            if (length(gene_list) == 0) {
-                species = 'auto'
-                return(list(
-                    species = NA_character_,
-                    gene_info = tribble(~GeneID, ~Symbol, ~description,
-                                        ~map_location),
-                    symbol2id = data_frame(),
-                    synonym2id = data_frame(),
-                    ensembl2id = data_frame()
-                ))
-            } else {
-                match.human = sum(tolower(gene_list) %in%
-                                      tolower(ids[['human']]))
-                match.mouse = sum(tolower(gene_list) %in%
-                                      tolower(ids[['mouse']]))
-                species = ifelse(match.human >= match.mouse,
-                                 'human', 'mouse')
-                print(paste('Use species:', species))
-                updateRadioButtons(session, "species", selected = species)
-                print(paste('Load RData of', species))
-                load(file.path('robj', paste0(species, '.RData')))
-            }
-        } else {
-            species = input$species
-            print(paste('Load RData of', species))
-            load(file.path('robj', paste0(species, '.RData')))
-        }
+        species = input$species
+        print(paste('Load RData of', species))
+        load(file.path('robj', paste0(species, '.RData')))
         return(list(
             species = species,
             gene_info = gene_info,
@@ -117,7 +91,21 @@ shinyServer(function(input, output, session) {
             mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
             select(-GeneID)
 
-    }, escape = FALSE)
+    },
+    server = FALSE,
+    escape = FALSE,
+    extension = 'Buttons',
+    options = list(
+        lengthMenu = list(c(10, 25, 50, 100, -1),
+                          c('10', '25', '50', '100', 'ALL')),
+        dom = 'Bfrtip',
+        buttons =
+            list('copy', list(
+                extend = 'collection',
+                buttons = c('csv', 'excel', 'pdf'),
+                text = 'Download'
+            ))
+    ))
 
     output$unmatched <- renderText({
         gene_list = get_gene_list()

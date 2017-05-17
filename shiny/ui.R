@@ -22,11 +22,9 @@ shinyUI(fluidPage(
         radioButtons(
             inputId = 'species',
             label = 'Species',
-            choices = setNames(c('auto', 'human', 'mouse'),
-                               c("Auto detect",
-                                 "Homo sapiens",
-                                 "Mus musculus")),
-            selected = "auto"
+            choices = setNames(c('human', 'mouse'),
+                               c("Homo sapiens", "Mus musculus")),
+            selected = "human"
         ),
         fileInput(
             inputId = 'gene_list_file',
@@ -36,16 +34,15 @@ shinyUI(fluidPage(
         textAreaInput(
             inputId = 'gene',
             label = "Gene List",
-            height = '300px'
-        )
+            height = '250px'
+        ),
+        verbatimTextOutput('gene_list_summary')
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
-        verbatimTextOutput('gene_list_summary'),
         tabsetPanel(
             id = 'output_panel',
-            type = 'pills',
             tabPanel(
                 title = "gene table",
                 dataTableOutput("gene_table")
