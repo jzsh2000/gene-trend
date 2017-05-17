@@ -118,7 +118,7 @@ shinyServer(function(input, output, session) {
         gene_list = get_gene_list()
         if (is.null(inFile)) {
             if (length(gene_list) == 0) {
-                return(as.character(Sys.Date()))
+                return(as.character(Sys.time()))
             } else {
                 search.res = get_search_result()
                 return(data_frame(name = gene_list) %>%
