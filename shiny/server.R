@@ -99,7 +99,9 @@ shinyServer(function(input, output, session) {
                 arrange(order)
         }
         search.res %>%
-            select(name, type, Symbol, description, map_location, GeneID) %>%
+            select(name, type, Symbol, Synonyms,
+                   description, type_of_gene,
+                   map_location, GeneID) %>%
             mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
             select(-GeneID)
     },
@@ -111,11 +113,17 @@ shinyServer(function(input, output, session) {
                           c('10', '25', '50', '100', 'ALL')),
         dom = 'Bfrtip',
         buttons =
-            list('copy', list(
-                extend = 'collection',
-                buttons = c('csv', 'excel', 'pdf'),
-                text = 'Download'
-            ))
+            list('copy',
+                 list(
+                     extend = 'collection',
+                     buttons = c('csv', 'excel', 'pdf'),
+                     text = 'Download'
+                 ),
+                 list(extend = 'colvis',
+                      columns = c(1,2,4,5,6,7))
+            ),
+        columnDefs = list(list(visible = FALSE,
+                               targets = c(1, 2,6,7)))
     ))
 
     output$unmatched <- renderText({
