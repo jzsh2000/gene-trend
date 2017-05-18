@@ -26,6 +26,12 @@ shinyUI(fluidPage(
                                c("Homo sapiens", "Mus musculus")),
             selected = "human"
         ),
+        selectizeInput(
+            inputId = 'orderby',
+            label = "Order by",
+            choices = setNames(c('na', 'ncbi'),
+                               c('None', 'NCBI gene weight'))
+        ),
         fileInput(
             inputId = 'gene_list_file',
             label = 'Upload gene list',

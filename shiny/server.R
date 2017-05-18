@@ -81,16 +81,27 @@ shinyServer(function(input, output, session) {
         )
     })
 
-    output$gene_table = renderDataTable({
+    output$gene_table = DT::renderDataTable({
+        gene_list = get_gene_list()
         search.res = get_search_result()
         gene_info = get_species()[['gene_info']]
+        if (input$orderby == 'na') {
+            search.res = data_frame(
+                name = gene_list,
+                count = seq_along(gene_list)
+            ) %>%
+                inner_join(search.res, by = 'name') %>%
+                left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
+                arrange(count)
+        } else if (input$orderby == 'ncbi') {
+            search.res = search.res %>%
+                left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
+                arrange(order)
+        }
         search.res %>%
-            left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
-            arrange(order) %>%
             select(name, type, Symbol, description, map_location, GeneID) %>%
             mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
             select(-GeneID)
-
     },
     server = FALSE,
     escape = FALSE,
