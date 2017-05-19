@@ -10,6 +10,13 @@ order <- read_tsv("data/current/Homo_sapiens.gene_order") %>%
     select(GeneID) %>%
     mutate(order = row_number())
 
+gene2pubmed <- read_tsv('data/current/Homo_sapiens.gene2pubmed') %>%
+    select(-1) %>%
+    group_by(GeneID) %>%
+    nest() %>%
+    rename(PubMed_ID = data) %>%
+    mutate(pmid_count = map_int(PubMed_ID, ~nrow(.)))
+
 gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     select(-1) %>%
     inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
@@ -19,7 +26,9 @@ gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     ungroup() %>%
     arrange(order) %>%
     mutate(order = 1:n()) %>%
-    arrange(GeneID)
+    arrange(GeneID) %>%
+    left_join(gene2pubmed, by = "GeneID") %>%
+    select(-PubMed_ID)
 
 symbol2id <- gene_info %>%
     select(Symbol, GeneID) %>%
@@ -48,7 +57,7 @@ synonym2id <- data_frame(
     filter(n() == 1) %>%
     ungroup()
 
-save(gene_info, symbol2id, synonym2id, ensembl2id,
+save(gene_info, symbol2id, synonym2id, ensembl2id, gene2pubmed,
      file = 'data/current/robj/human.RData')
 human.id = c(gene_info$GeneID,
              symbol2id$Symbol,
@@ -60,6 +69,13 @@ order <- read_tsv("data/current/Mus_musculus.gene_order") %>%
     select(GeneID) %>%
     mutate(order = row_number())
 
+gene2pubmed <- read_tsv('data/current/Mus_musculus.gene2pubmed') %>%
+    select(-1) %>%
+    group_by(GeneID) %>%
+    nest() %>%
+    rename(PubMed_ID = data) %>%
+    mutate(pmid_count = map_int(PubMed_ID, ~nrow(.)))
+
 gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     select(-1) %>%
     inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
@@ -69,7 +85,9 @@ gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     ungroup() %>%
     arrange(order) %>%
     mutate(order = 1:n()) %>%
-    arrange(GeneID)
+    arrange(GeneID) %>%
+    left_join(gene2pubmed, by = "GeneID") %>%
+    select(-PubMed_ID)
 
 symbol2id <- gene_info %>%
     select(Symbol, GeneID) %>%
@@ -98,7 +116,7 @@ synonym2id <- data_frame(
     filter(n() == 1) %>%
     ungroup()
 
-save(gene_info, symbol2id, synonym2id, ensembl2id,
+save(gene_info, symbol2id, synonym2id, ensembl2id, gene2pubmed,
      file = 'data/current/robj/mouse.RData')
 mouse.id = c(gene_info$GeneID,
              symbol2id$Symbol,
