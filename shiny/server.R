@@ -83,28 +83,38 @@ shinyServer(function(input, output, session) {
 
     output$gene_table = DT::renderDataTable({
         gene_list = get_gene_list()
-        search.res = get_search_result()
         gene_info = get_species()[['gene_info']]
-        if (input$orderby == 'na') {
-            search.res = data_frame(
-                name = gene_list,
-                count = seq_along(gene_list)
-            ) %>%
-                inner_join(search.res, by = 'name') %>%
-                left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
-                arrange(count)
-        } else if (input$orderby == 'ncbi') {
-            search.res = search.res %>%
-                left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
-                arrange(order)
-        }
-        search.res %>%
-            select(name, type, Symbol, Synonyms,
-                   description, type_of_gene,
-                   map_location, GeneID) %>%
+        search.res = get_search_result() %>%
+            left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
             mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
             select(-GeneID)
+
+        if (input$orderby == 'na') {
+            search.res = search.res %>%
+                inner_join(data_frame(
+                    name = gene_list,
+                    original_order = seq_along(gene_list)
+                ), by = 'name') %>%
+                arrange(original_order) %>%
+                select(name, type, Symbol, Synonyms,
+                       description, type_of_gene,
+                       map_location, original_order)
+        } else if (input$orderby == 'ncbi') {
+            search.res = search.res %>%
+                arrange(order) %>%
+                select(name, type, Symbol, Synonyms,
+                       description, type_of_gene,
+                       map_location, order)
+        } else if (input$orderby == 'pubmed') {
+            search.res = search.res %>%
+                arrange(desc(pmid_count)) %>%
+                select(name, type, Symbol, Synonyms,
+                       description, type_of_gene,
+                       map_location, pmid_count)
+        }
+        search.res
     },
+    rownames = FALSE,
     server = FALSE,
     escape = FALSE,
     extension = 'Buttons',
@@ -120,10 +130,10 @@ shinyServer(function(input, output, session) {
                      text = 'Download'
                  ),
                  list(extend = 'colvis',
-                      columns = c(1,2,4,5,6,7))
+                      columns = c(0,1,3,4,5,6,7))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(1, 2,6,7)))
+                               targets = c(0,1,5,6,7)))
     ))
 
     output$unmatched <- renderText({

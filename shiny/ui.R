@@ -29,8 +29,9 @@ shinyUI(fluidPage(
         selectizeInput(
             inputId = 'orderby',
             label = "Order by",
-            choices = setNames(c('na', 'ncbi'),
-                               c('None', 'NCBI gene weight'))
+            choices = setNames(c('na', 'ncbi', 'pubmed'),
+                               c('None', 'NCBI gene weight',
+                                 'PubMed articles'))
         ),
         fileInput(
             inputId = 'gene_list_file',
