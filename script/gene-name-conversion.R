@@ -15,7 +15,8 @@ gene2pubmed <- read_tsv('data/current/Homo_sapiens.gene2pubmed') %>%
     group_by(GeneID) %>%
     nest() %>%
     rename(PubMed_ID = data) %>%
-    mutate(pmid_count = map_int(PubMed_ID, ~nrow(.)))
+    mutate(pm_count = map_int(PubMed_ID, ~nrow(.))) %>%
+    mutate(pm_rank = min_rank(desc(pm_count)))
 
 gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     select(-1) %>%
@@ -74,7 +75,8 @@ gene2pubmed <- read_tsv('data/current/Mus_musculus.gene2pubmed') %>%
     group_by(GeneID) %>%
     nest() %>%
     rename(PubMed_ID = data) %>%
-    mutate(pmid_count = map_int(PubMed_ID, ~nrow(.)))
+    mutate(pm_count = map_int(PubMed_ID, ~nrow(.))) %>%
+    mutate(pm_rank = min_rank(desc(pm_count)))
 
 gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     select(-1) %>%

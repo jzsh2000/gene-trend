@@ -107,10 +107,11 @@ shinyServer(function(input, output, session) {
                        map_location, order)
         } else if (input$orderby == 'pubmed') {
             search.res = search.res %>%
-                arrange(desc(pmid_count)) %>%
+                arrange(pm_rank) %>%
+                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')')) %>%
                 select(name, type, Symbol, Synonyms,
                        description, type_of_gene,
-                       map_location, pmid_count)
+                       map_location, pubmed)
         }
         search.res
     },
