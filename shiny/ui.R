@@ -22,16 +22,16 @@ shinyUI(fluidPage(
         radioButtons(
             inputId = 'species',
             label = 'Species',
-            choices = setNames(c('human', 'mouse'),
-                               c("Homo sapiens", "Mus musculus")),
+            choices = c('Homo sapiens' = 'human',
+                        'Mus musculus' = 'mouse'),
             selected = "human"
         ),
         selectizeInput(
             inputId = 'orderby',
             label = "Order by",
-            choices = setNames(c('na', 'ncbi', 'pubmed'),
-                               c('None', 'NCBI gene weight',
-                                 'PubMed articles'))
+            choices = c('None' = 'na',
+                        'NCBI gene weight' = 'ncbi',
+                        'PubMed articles' = 'pubmed')
         ),
         fileInput(
             inputId = 'gene_list_file',
