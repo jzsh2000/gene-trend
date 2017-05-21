@@ -29,6 +29,8 @@ efetch-taxonomy:
 efetch-pubmed:
 	@echo "## fetch pubmed article information"
 	bash ./script/efetch-pubmed.sh ${outdir}
+	cd ${outdir}; bash ./script/search-pubmed-mesh-subheading.sh immunology
+	gzip ${outdir}/immunology.txt
 
 relink:
 	find data -type f -name current -delete
@@ -36,6 +38,7 @@ relink:
 
 somework:
 	bash ./script/split-gene-info.sh
+	Rscript ./script/gene-name-conversion.R
 
 clean:
 	rm -ir ${outdir}
