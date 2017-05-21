@@ -4,6 +4,7 @@ library(stringr)
 
 # ========== prepare directory
 dir.create('data/current/robj', showWarnings = FALSE)
+immunology <- as.integer(readLines("data/current/immunology.txt.gz"))
 
 # ===== process human gene
 order <- read_tsv("data/current/Homo_sapiens.gene_order") %>%
@@ -18,6 +19,16 @@ gene2pubmed <- read_tsv('data/current/Homo_sapiens.gene2pubmed') %>%
     mutate(pm_count = map_int(PubMed_ID, ~nrow(.))) %>%
     mutate(pm_rank = min_rank(desc(pm_count)))
 
+gene2pubmed.immunology <-
+    read_tsv('data/current/Homo_sapiens.gene2pubmed') %>%
+    select(-1) %>%
+    group_by(GeneID) %>%
+    filter(PubMed_ID %in% immunology) %>%
+    nest() %>%
+    rename(PubMed_ID = data) %>%
+    mutate(pm_count_immuno = map_int(PubMed_ID, ~nrow(.))) %>%
+    mutate(pm_rank_immuno = min_rank(desc(pm_count_immuno)))
+
 gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     select(-1) %>%
     inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
@@ -29,6 +40,8 @@ gene_info <- read_tsv("data/current/Homo_sapiens.gene_info") %>%
     mutate(order = 1:n()) %>%
     arrange(GeneID) %>%
     left_join(gene2pubmed, by = "GeneID") %>%
+    select(-PubMed_ID) %>%
+    left_join(gene2pubmed.immunology, by = "GeneID") %>%
     select(-PubMed_ID)
 
 symbol2id <- gene_info %>%
@@ -58,7 +71,8 @@ synonym2id <- data_frame(
     filter(n() == 1) %>%
     ungroup()
 
-save(gene_info, symbol2id, synonym2id, ensembl2id, gene2pubmed,
+save(gene_info, symbol2id, synonym2id, ensembl2id,
+     gene2pubmed, gene2pubmed.immunology,
      file = 'data/current/robj/human.RData')
 human.id = c(gene_info$GeneID,
              symbol2id$Symbol,
@@ -78,6 +92,16 @@ gene2pubmed <- read_tsv('data/current/Mus_musculus.gene2pubmed') %>%
     mutate(pm_count = map_int(PubMed_ID, ~nrow(.))) %>%
     mutate(pm_rank = min_rank(desc(pm_count)))
 
+gene2pubmed.immunology <-
+    read_tsv('data/current/Mus_musculus.gene2pubmed') %>%
+    select(-1) %>%
+    group_by(GeneID) %>%
+    filter(PubMed_ID %in% immunology) %>%
+    nest() %>%
+    rename(PubMed_ID = data) %>%
+    mutate(pm_count_immuno = map_int(PubMed_ID, ~nrow(.))) %>%
+    mutate(pm_rank_immuno = min_rank(desc(pm_count_immuno)))
+
 gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     select(-1) %>%
     inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
@@ -89,6 +113,8 @@ gene_info <- read_tsv("data/current/Mus_musculus.gene_info") %>%
     mutate(order = 1:n()) %>%
     arrange(GeneID) %>%
     left_join(gene2pubmed, by = "GeneID") %>%
+    select(-PubMed_ID) %>%
+    left_join(gene2pubmed.immunology, by = "GeneID") %>%
     select(-PubMed_ID)
 
 symbol2id <- gene_info %>%
@@ -118,7 +144,8 @@ synonym2id <- data_frame(
     filter(n() == 1) %>%
     ungroup()
 
-save(gene_info, symbol2id, synonym2id, ensembl2id, gene2pubmed,
+save(gene_info, symbol2id, synonym2id, ensembl2id,
+     gene2pubmed, gene2pubmed.immunology,
      file = 'data/current/robj/mouse.RData')
 mouse.id = c(gene_info$GeneID,
              symbol2id$Symbol,

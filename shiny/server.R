@@ -112,6 +112,14 @@ shinyServer(function(input, output, session) {
                 select(name, type, Symbol, Synonyms,
                        description, type_of_gene,
                        map_location, pubmed)
+        } else if (input$orderby == 'pubmed_immuno') {
+            search.res = search.res %>%
+                arrange(pm_rank_immuno) %>%
+                mutate(pubmed = paste0(pm_rank_immuno,
+                                       ' (', pm_count_immuno, ')')) %>%
+                select(name, type, Symbol, Synonyms,
+                       description, type_of_gene,
+                       map_location, pubmed)
         }
         search.res
     },

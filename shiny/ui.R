@@ -31,7 +31,8 @@ shinyUI(fluidPage(
             label = "Order by",
             choices = c('None' = 'na',
                         'NCBI gene weight' = 'ncbi',
-                        'PubMed articles' = 'pubmed')
+                        'PubMed articles' = 'pubmed',
+                        'PubMed articles (immunology)' = 'pubmed_immuno')
         ),
         fileInput(
             inputId = 'gene_list_file',
