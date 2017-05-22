@@ -81,6 +81,12 @@ shinyServer(function(input, output, session) {
         )
     })
 
+    get_unmatched <- reactive({
+        gene_list = get_gene_list()
+        search.res = get_search_result()
+        setdiff(gene_list, search.res$name)
+    })
+
     output$gene_table = DT::renderDataTable({
         gene_list = get_gene_list()
         gene_info = get_species()[['gene_info']]
@@ -146,9 +152,7 @@ shinyServer(function(input, output, session) {
     ))
 
     output$unmatched <- renderText({
-        gene_list = get_gene_list()
-        search.res = get_search_result()
-        setdiff(gene_list, search.res$name)
+        paste(get_unmatched(), collapse = '\n')
     })
 
     output$gene_list_summary <- renderPrint({
@@ -171,6 +175,30 @@ shinyServer(function(input, output, session) {
             return(data_frame(name = gene_list) %>%
                        left_join(search.res, by = "name") %>%
                        count(type))
+        }
+    })
+
+    output$output_panel <- renderUI({
+        if (length(get_unmatched()) == 0) {
+            tabsetPanel(
+                id = 'output_panel',
+                tabPanel(
+                    title = "gene table",
+                    dataTableOutput("gene_table")
+                )
+            )
+        } else {
+            tabsetPanel(
+                id = 'output_panel',
+                tabPanel(
+                    title = "gene table",
+                    dataTableOutput("gene_table")
+                ),
+                tabPanel(
+                    title = "unmatched",
+                    verbatimTextOutput('unmatched')
+                )
+            )
         }
     })
 })

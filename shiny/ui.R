@@ -49,17 +49,18 @@ shinyUI(fluidPage(
 
     # Show a plot of the generated distribution
     mainPanel(
-        tabsetPanel(
-            id = 'output_panel',
-            tabPanel(
-                title = "gene table",
-                dataTableOutput("gene_table")
-            ),
-            tabPanel(
-                title = "unmatched",
-                verbatimTextOutput('unmatched')
-            )
-        )
+        uiOutput('output_panel')
+        # tabsetPanel(
+        #     id = 'output_panel',
+        #     tabPanel(
+        #         title = "gene table",
+        #         dataTableOutput("gene_table")
+        #     ),
+        #     tabPanel(
+        #         title = "unmatched",
+        #         verbatimTextOutput('unmatched')
+        #     )
+        # )
     )
   )
 ))
