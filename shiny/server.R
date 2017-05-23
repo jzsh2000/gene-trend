@@ -155,12 +155,12 @@ shinyServer(function(input, output, session) {
         paste(get_unmatched(), collapse = '\n')
     })
 
-    output$gene_list_summary <- renderPrint({
+    output$gene_list_summary <- renderTable({
         inFile <- input$gene_list_file
         gene_list = get_gene_list()
         if (is.null(inFile)) {
             if (length(gene_list) == 0) {
-                return(as.character(Sys.time()))
+                return(data_frame('current time' = as.character(Sys.time())))
             } else {
                 search.res = get_search_result()
                 return(data_frame(name = gene_list) %>%

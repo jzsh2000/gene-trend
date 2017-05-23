@@ -44,7 +44,7 @@ shinyUI(fluidPage(
             label = "Gene List",
             height = '250px'
         ),
-        verbatimTextOutput('gene_list_summary')
+        tableOutput('gene_list_summary')
     ),
 
     # Show a plot of the generated distribution
