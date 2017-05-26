@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(shinyjs)
 library(DT)
 library(tidyverse)
 library(stringr)
@@ -16,13 +17,20 @@ ids = read_rds('robj/id.rds')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+    rv <- reactiveValues(data = NULL)
+    observe({
+        req(input$gene_list_file)
+        rv$data <- paste(readLines(input$gene_list_file$datapath),
+                         collapse = '\n')
+    })
+
     get_gene_list <- reactive({
         gene_list = str_split(input$gene, '\\n')[[1]] %>%
             map_chr(str_trim)
 
         # remove empty stings
         str_subset(gene_list, '.')
-    }) %>% debounce(2000)
+    }) %>% debounce(1000)
 
     get_species <- reactive({
         species = input$species
@@ -192,9 +200,8 @@ shinyServer(function(input, output, session) {
                            count(type))
             }
         } else {
-            updateTextAreaInput(session, 'gene',
-                                value = paste(readLines(inFile$datapath),
-                                              collapse = '\n'))
+            print(inFile$datapath)
+            updateTextAreaInput(session, 'gene', value = rv$data)
             search.res = get_search_result()[['matched']]
             return(data_frame(name = gene_list) %>%
                        left_join(search.res, by = "name") %>%
@@ -224,5 +231,11 @@ shinyServer(function(input, output, session) {
                 )
             )
         }
+    })
+
+    observeEvent(input$clear, {
+        rv$data <- NULL
+        reset("gene_list_file")
+        updateTextAreaInput(session, 'gene', value = '')
     })
 })

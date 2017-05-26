@@ -8,59 +8,72 @@
 #
 
 library(shiny)
+library(shinyjs)
 library(DT)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
+    useShinyjs(),
 
-  # Application title
-  titlePanel("Gene ID conversion"),
+    # Application title
+    titlePanel("Gene ID conversion"),
 
-  # Sidebar with a slider input for number of bins
-  sidebarLayout(
-    sidebarPanel(
-        radioButtons(
-            inputId = 'species',
-            label = 'Species',
-            choices = c('Homo sapiens' = 'human',
-                        'Mus musculus' = 'mouse'),
-            selected = "human"
+    # Sidebar with a slider input for number of bins
+    sidebarLayout(
+        sidebarPanel(
+            radioButtons(
+                inputId = 'species',
+                label = 'Species',
+                choices = c('Homo sapiens' = 'human',
+                            'Mus musculus' = 'mouse'),
+                selected = "human"
+            ),
+            selectizeInput(
+                inputId = 'orderby',
+                label = "Order by",
+                choices = c('None' = 'na',
+                            'NCBI gene weight' = 'ncbi',
+                            'PubMed articles' = 'pubmed',
+                            'PubMed articles (immunology)' = 'pubmed_immuno')
+            ),
+            hr(),
+            fileInput(
+                inputId = 'gene_list_file',
+                label = 'Upload gene list',
+                accept = 'text/plain'
+            ),
+            fluidRow(
+                column(width = 9,
+                       textAreaInput(
+                           inputId = 'gene',
+                           label = "Gene List",
+                           height = '200px',
+                           placeholder = 'Your awesome gene list'
+                       )),
+                column(width = 3,
+                       actionLink(inputId = 'clear', label = 'clear'),
+                       hr(),
+                       actionLink(inputId = 'list1', label = 'List 1'),
+                       br(),
+                       actionLink(inputId = 'list2', label = 'List 2'))
+            ),
+            tableOutput('gene_list_summary')
         ),
-        selectizeInput(
-            inputId = 'orderby',
-            label = "Order by",
-            choices = c('None' = 'na',
-                        'NCBI gene weight' = 'ncbi',
-                        'PubMed articles' = 'pubmed',
-                        'PubMed articles (immunology)' = 'pubmed_immuno')
-        ),
-        fileInput(
-            inputId = 'gene_list_file',
-            label = 'Upload gene list',
-            accept = 'text/plain'
-        ),
-        textAreaInput(
-            inputId = 'gene',
-            label = "Gene List",
-            height = '250px'
-        ),
-        tableOutput('gene_list_summary')
-    ),
 
-    # Show a plot of the generated distribution
-    mainPanel(
-        uiOutput('output_panel')
-        # tabsetPanel(
-        #     id = 'output_panel',
-        #     tabPanel(
-        #         title = "gene table",
-        #         dataTableOutput("gene_table")
-        #     ),
-        #     tabPanel(
-        #         title = "unmatched",
-        #         verbatimTextOutput('unmatched')
-        #     )
-        # )
+        # Show a plot of the generated distribution
+        mainPanel(
+            uiOutput('output_panel')
+            # tabsetPanel(
+            #     id = 'output_panel',
+            #     tabPanel(
+            #         title = "gene table",
+            #         dataTableOutput("gene_table")
+            #     ),
+            #     tabPanel(
+            #         title = "unmatched",
+            #         verbatimTextOutput('unmatched')
+            #     )
+            # )
+        )
     )
-  )
 ))
