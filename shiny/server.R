@@ -180,7 +180,7 @@ shinyServer(function(input, output, session) {
                       columns = c(0,1,3,4,5,6,7))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(0,1,5,6,7)))
+                               targets = c(0,1,5,6)))
     ))
 
     output$unmatched <- renderText({
@@ -237,5 +237,21 @@ shinyServer(function(input, output, session) {
         rv$data <- NULL
         reset("gene_list_file")
         updateTextAreaInput(session, 'gene', value = '')
+    })
+
+    observeEvent(input$list1, {
+        rv$data <- NULL
+        reset("gene_list_file")
+        updateTextAreaInput(session, 'gene',
+                            value = paste(readLines('example/1.txt'),
+                                          collapse = '\n'))
+    })
+
+    observeEvent(input$list2, {
+        rv$data <- NULL
+        reset("gene_list_file")
+        updateTextAreaInput(session, 'gene',
+                            value = paste(readLines('example/2.txt'),
+                                          collapse = '\n'))
     })
 })
