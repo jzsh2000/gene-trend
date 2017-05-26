@@ -48,49 +48,73 @@ shinyServer(function(input, output, session) {
         ensembl2id = get_species()[['ensembl2id']]
 
         if (length(gene_list) == 0) {
-            return(tibble(name = character(),
-                          GeneID = integer(),
-                          type = character()))
+            return(list(
+                matched = tibble(name = character(),
+                                 GeneID = integer(),
+                                 type = character()),
+                unmatched = character()))
         }
+        res.unmatched = gene_list
 
-        bind_rows(
-            gene_info %>%
-                filter(GeneID %in% gene_list) %>%
-                mutate(name = as.character(GeneID)) %>%
-                select(name, GeneID) %>%
-                mutate(type = 'entrez id'),
-            symbol2id %>%
-                filter(Symbol %in% gene_list) %>%
-                rename(name = Symbol) %>%
-                mutate(type = 'symbol'),
-            synonym2id %>%
-                filter(Synonym %in% gene_list) %>%
-                rename(name = Synonym) %>%
-                mutate(type = 'synonym'),
+        res_part.id = gene_info %>%
+            filter(GeneID %in% res.unmatched) %>%
+            mutate(name = as.character(GeneID)) %>%
+            select(name, GeneID) %>%
+            mutate(type = 'entrez id')
+        res.unmatched = setdiff(res.unmatched, res_part.id$name)
+
+        res_part.symbol = symbol2id %>%
+            mutate(Symbol.l = tolower(Symbol)) %>%
+            inner_join(
+                data_frame(
+                    name = res.unmatched,
+                    Symbol.l = tolower(name)
+                ),
+                by = 'Symbol.l'
+            ) %>%
+            select(name, GeneID) %>%
+            mutate(type = 'symbol')
+        res.unmatched = setdiff(res.unmatched, res_part.symbol$name)
+
+        res_part.synonym = synonym2id %>%
+            mutate(Synonym.l = tolower(Synonym)) %>%
+            inner_join(
+                data_frame(
+                    name = res.unmatched,
+                    Synonym.l = tolower(name)
+                ),
+                by = 'Synonym.l'
+            ) %>%
+            select(name, GeneID) %>%
+            mutate(type = 'synonym')
+        res.unmatched = setdiff(res.unmatched, res_part.synonym$name)
+
             # 'ENSG00000000003.14' should be treated as 'ENSG00000000003'
-            data_frame(name = gene_list,
-                       gene = str_extract(gene_list, '^[^.]*')) %>%
-                inner_join(ensembl2id, by = c("gene" = "Ensembl")) %>%
-                select(name, GeneID) %>%
-                mutate(type = 'ensembl id')
-            # data_frame(
-            #     name = setdiff(gene_list, ids[[species]])
-            # ) %>%
-            #     mutate(GeneID = NA_integer_,
-            #            type = 'unmatched')
-        )
+        res_part.ensembl = data_frame(name = res.unmatched,
+                                      gene = str_extract(name,
+                                                         '^[^.]*')) %>%
+            inner_join(ensembl2id, by = c("gene" = "Ensembl")) %>%
+            select(name, GeneID) %>%
+            mutate(type = 'ensembl id')
+        res.unmatched = setdiff(res.unmatched, res_part.ensembl$name)
+
+        list(matched = bind_rows(res_part.id,
+                                 res_part.symbol,
+                                 res_part.synonym,
+                                 res_part.ensembl),
+             unmatched = res.unmatched)
     })
 
     get_unmatched <- reactive({
         gene_list = get_gene_list()
-        search.res = get_search_result()
-        setdiff(gene_list, search.res$name)
+        gene_list.unmatched = get_search_result()[['unmatched']]
+        gene_list[gene_list %in% gene_list.unmatched]
     })
 
     output$gene_table = DT::renderDataTable({
         gene_list = get_gene_list()
         gene_info = get_species()[['gene_info']]
-        search.res = get_search_result() %>%
+        search.res = get_search_result()[['matched']] %>%
             left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
             mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
             select(-GeneID)
@@ -162,7 +186,7 @@ shinyServer(function(input, output, session) {
             if (length(gene_list) == 0) {
                 return(data_frame('current time' = as.character(Sys.time())))
             } else {
-                search.res = get_search_result()
+                search.res = get_search_result()[['matched']]
                 return(data_frame(name = gene_list) %>%
                            left_join(search.res, by = "name") %>%
                            count(type))
@@ -171,7 +195,7 @@ shinyServer(function(input, output, session) {
             updateTextAreaInput(session, 'gene',
                                 value = paste(readLines(inFile$datapath),
                                               collapse = '\n'))
-            search.res = get_search_result()
+            search.res = get_search_result()[['matched']]
             return(data_frame(name = gene_list) %>%
                        left_join(search.res, by = "name") %>%
                        count(type))
