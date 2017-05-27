@@ -9,8 +9,8 @@ supported_species <- c(
 
 # ========== prepare directory
 dir.create('data/current/robj', showWarnings = FALSE)
-immuno <- as.integer(readLines("data/current/topic/immunology.txt.gz"))
-tumor <- as.integer(readLines("data/current/topic/neoplasms.txt.gz"))
+immuno <- as.integer(read_lines("data/current/topic/immunology.txt.gz"))
+tumor <- as.integer(read_lines("data/current/topic/neoplasms.txt.gz"))
 
 walk2(unname(supported_species),
       names(supported_species),
@@ -28,17 +28,16 @@ walk2(unname(supported_species),
               ensembl_pattern = '(?<=Ensembl:)ENSMUSG[0-9]*'
           }
 
-          order <- read_tsv(gene_order_file) %>%
-              select(GeneID) %>%
-              mutate(order = row_number(GeneID))
+          order <- read_tsv(gene_order_file,
+                            col_types = '__i______________') %>%
+              mutate(order = seq_along(GeneID))
 
-          pmid = sort(unique(read_tsv(gene2pubmed_file)[['PubMed_ID']]))
+          pmid = unique(read_tsv(gene2pubmed_file,col_types = '__i'))[[1]]
           pmid.immuno  = intersect(pmid, immuno)
           pmid.tumor = intersect(pmid, tumor)
 
           gene2pubmed <-
-              read_tsv(gene2pubmed_file, col_types = 'iii') %>%
-              select(-1) %>%
+              read_tsv(gene2pubmed_file, col_types = '_ii') %>%
               group_by(GeneID) %>%
               nest() %>%
               rename(PubMed_ID = data) %>%
@@ -46,8 +45,7 @@ walk2(unname(supported_species),
               mutate(pm_rank = min_rank(desc(pm_count)))
 
           gene2pubmed.immuno <-
-              read_tsv(gene2pubmed_file, col_types = 'iii') %>%
-              select(-1) %>%
+              read_tsv(gene2pubmed_file, col_types = '_ii') %>%
               group_by(GeneID) %>%
               filter(PubMed_ID %in% pmid.immuno) %>%
               nest() %>%
@@ -56,8 +54,7 @@ walk2(unname(supported_species),
               mutate(pm_rank_immuno = min_rank(desc(pm_count_immuno)))
 
           gene2pubmed.tumor <-
-              read_tsv(gene2pubmed_file, col_types = 'iii') %>%
-              select(-1) %>%
+              read_tsv(gene2pubmed_file, col_types = '_ii') %>%
               group_by(GeneID) %>%
               filter(PubMed_ID %in% pmid.tumor) %>%
               nest() %>%
@@ -65,8 +62,8 @@ walk2(unname(supported_species),
               mutate(pm_count_tumor = map_int(PubMed_ID, ~nrow(.))) %>%
               mutate(pm_rank_tumor = min_rank(desc(pm_count_tumor)))
 
-          gene_info <- read_tsv(gene_info_file) %>%
-              select(-c(`#tax_id`, LocusTag, Modification_date)) %>%
+          gene_info <- read_tsv(gene_info_file,
+                                col_types = '_ic_cccccccc_c_') %>%
               inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
               group_by(Symbol) %>%
               arrange(order) %>%
@@ -82,12 +79,12 @@ walk2(unname(supported_species),
               left_join(gene2pubmed.immuno, by = "GeneID") %>%
               select(-PubMed_ID) %>%
               replace_na(list(pm_count_immuno = 0,
-                              pm_rank = max(.$pm_rank_immuno,
+                              pm_rank_immuno = max(.$pm_rank_immuno,
                                             na.rm = T) + 1)) %>%
               left_join(gene2pubmed.tumor, by = "GeneID") %>%
               select(-PubMed_ID) %>%
               replace_na(list(pm_count_tumor = 0,
-                              pm_rank = max(.$pm_rank_tumor,
+                              pm_rank_tumor = max(.$pm_rank_tumor,
                                             na.rm = T) + 1))
 
           symbol2id <- gene_info %>%
