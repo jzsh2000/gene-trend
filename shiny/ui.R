@@ -34,7 +34,8 @@ shinyUI(fluidPage(
                 choices = c('None' = 'na',
                             'NCBI gene weight' = 'ncbi',
                             'PubMed articles' = 'pubmed',
-                            'PubMed articles (immunology)' = 'pubmed_immuno')
+                            'PubMed articles (immunology)' = 'pubmed_immuno',
+                            'PubMed articles (tumour)' = 'pubmed_tumor')
             ),
             hr(),
             fileInput(

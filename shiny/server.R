@@ -13,8 +13,6 @@ library(DT)
 library(tidyverse)
 library(stringr)
 
-ids = read_rds('robj/id.rds')
-
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
     rv <- reactiveValues(data = NULL)
@@ -155,6 +153,14 @@ shinyServer(function(input, output, session) {
                 arrange(pm_rank_immuno) %>%
                 mutate(pubmed = paste0(pm_rank_immuno,
                                        ' (', pm_count_immuno, ')')) %>%
+                select(name, type, Symbol, Synonyms,
+                       description, type_of_gene,
+                       map_location, pubmed)
+        } else if (input$orderby == 'pubmed_tumor') {
+            search.res = search.res %>%
+                arrange(pm_rank_tumor) %>%
+                mutate(pubmed = paste0(pm_rank_tumor,
+                                       ' (', pm_count_tumor, ')')) %>%
                 select(name, type, Symbol, Synonyms,
                        description, type_of_gene,
                        map_location, pubmed)

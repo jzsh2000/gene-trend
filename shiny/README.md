@@ -7,4 +7,8 @@ Currently following orders are supported:
 
 * NCBI gene weight
 * PubMed articles
-* PubMed articles (immunology)
+* PubMed articles ([immunology][immunology])
+* PubMed articles ([tumour][tumour])
+
+[immunology]: https://www.ncbi.nlm.nih.gov/pubmed/?term=immunology%5BMeSH+Subheading%5D
+[tumour]: https://www.ncbi.nlm.nih.gov/pubmed/?term=neoplasms%5Bmesh%5D
