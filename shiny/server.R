@@ -12,6 +12,7 @@ library(shinyjs)
 library(DT)
 library(tidyverse)
 library(stringr)
+library(htmltools)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -122,7 +123,13 @@ shinyServer(function(input, output, session) {
         gene_info = get_species()[['gene_info']]
         search.res = get_search_result()[['matched']] %>%
             left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
-            mutate(Symbol = paste0('<a href="http://www.ncbi.nlm.nih.gov/gene/', GeneID, '" target=_black>', Symbol,'</a>')) %>%
+            mutate(Symbol =
+                       paste0('<a ',
+                              'href="http://www.ncbi.nlm.nih.gov/gene/',
+                              GeneID, '" ',
+                              'target=_black ',
+                              'title="', htmlEscape(Summary), '"',
+                              '>', Symbol,'</a>')) %>%
             select(-GeneID)
 
         if (input$orderby == 'na') {

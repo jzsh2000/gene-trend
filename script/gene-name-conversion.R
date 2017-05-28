@@ -18,7 +18,10 @@ walk2(unname(supported_species),
           print(paste('Species:', full_name))
           gene_order_file = paste0('data/current/',full_name,'.gene_order')
           gene_info_file = paste0('data/current/',full_name,'.gene_info')
-          gene2pubmed_file = paste0('data/current/',full_name,'.gene2pubmed')
+          gene_summary_file = paste0('data/current/',full_name,
+                                     '.gene_summary')
+          gene2pubmed_file = paste0('data/current/',full_name,
+                                    '.gene2pubmed')
           rdata_file = paste0('data/current/robj/',short_name,'.RData')
 
           ensembl_pattern = 'some_strange_pattern'
@@ -28,8 +31,9 @@ walk2(unname(supported_species),
               ensembl_pattern = '(?<=Ensembl:)ENSMUSG[0-9]*'
           }
 
-          order <- read_tsv(gene_order_file,
-                            col_types = '__i______________') %>%
+          order <- suppressMessages(
+              read_tsv(gene_order_file,
+                       col_types = '__i______________')) %>%
               mutate(order = seq_along(GeneID))
 
           pmid = unique(read_tsv(gene2pubmed_file,col_types = '__i'))[[1]]
@@ -62,8 +66,14 @@ walk2(unname(supported_species),
               mutate(pm_count_tumor = map_int(PubMed_ID, ~nrow(.))) %>%
               mutate(pm_rank_tumor = min_rank(desc(pm_count_tumor)))
 
-          gene_info <- read_tsv(gene_info_file,
-                                col_types = '_ic_cccccccc_c_') %>%
+          gene_summary <- read_tsv(gene_summary_file,
+                                   col_names = c('GeneID', 'Summary'),
+                                   col_types = 'ic') %>%
+              replace_na(list(Summary = ''))
+
+          gene_info <- suppressMessages(
+              read_tsv(gene_info_file,
+                       col_types = '_ic_cccccccc_c_')) %>%
               inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
               group_by(Symbol) %>%
               arrange(order) %>%
@@ -72,6 +82,7 @@ walk2(unname(supported_species),
               arrange(order) %>%
               mutate(order = 1:n()) %>%
               arrange(GeneID) %>%
+              left_join(gene_summary, by = "GeneID") %>%
               left_join(gene2pubmed, by = "GeneID") %>%
               select(-PubMed_ID) %>%
               replace_na(list(pm_count = 0,
