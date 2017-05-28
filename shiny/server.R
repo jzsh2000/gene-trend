@@ -170,6 +170,7 @@ shinyServer(function(input, output, session) {
     rownames = FALSE,
     server = FALSE,
     escape = FALSE,
+    selection = 'single',
     extension = 'Buttons',
     options = list(
         lengthMenu = list(c(10, 25, 50, 100, -1),
