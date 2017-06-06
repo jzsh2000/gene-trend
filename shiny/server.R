@@ -256,13 +256,29 @@ shinyServer(function(input, output, session) {
     })
 
     output$pmid <- renderUI({
-        tags$ul(lapply(rv$pmid, function(id) {
-            tags$li(tags$a(
-                as.character(id),
-                target = '_blank',
-                href = paste('https://www.ncbi.nlm.nih.gov/pubmed',
-                       as.character(id), sep = '/')))
-        }))
+        get_pmid_link <- function(pmid_list) {
+            tags$ul(lapply(pmid_list, function(id) {
+                tags$li(tags$a(
+                    as.character(id),
+                    target = '_blank',
+                    href = paste('https://www.ncbi.nlm.nih.gov/pubmed',
+                                 as.character(id), sep = '/')))
+            }))
+        }
+        if (length(rv$pmid) > 20) {
+            tagList(
+                tags$a('See all citations in PubMed',
+                       href = paste0('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=',
+                                     get_selected_geneid())),
+                get_pmid_link(sort(rv$pmid, decreasing = TRUE)[1:20])
+            )
+        } else {
+            tagList(
+                tags$p('Citations in PubMed:'),
+                get_pmid_link(sort(rv$pmid, decreasing = TRUE))
+            )
+        }
+
     })
 
     observeEvent(input$clear, {
