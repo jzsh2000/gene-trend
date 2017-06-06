@@ -16,7 +16,7 @@ library(htmltools)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-    rv <- reactiveValues(data = NULL)
+    rv <- reactiveValues(data = NULL, summary = '', pmid = integer())
     observe({
         req(input$gene_list_file)
         rv$data <- paste(readLines(input$gene_list_file$datapath),
@@ -118,7 +118,7 @@ shinyServer(function(input, output, session) {
         gene_list[gene_list %in% gene_list.unmatched]
     })
 
-    output$gene_table = DT::renderDataTable({
+    get_ordered_table <- reactive({
         gene_list = get_gene_list()
         gene_info = get_species()[['gene_info']]
         search.res = get_search_result()[['matched']] %>%
@@ -128,9 +128,7 @@ shinyServer(function(input, output, session) {
                               'href="http://www.ncbi.nlm.nih.gov/gene/',
                               GeneID, '" ',
                               'target=_black ',
-                              'title="', htmlEscape(Summary), '"',
-                              '>', Symbol,'</a>')) %>%
-            select(-GeneID)
+                              '>', Symbol,'</a>'))
 
         if (input$orderby == 'na') {
             search.res = search.res %>%
@@ -138,41 +136,47 @@ shinyServer(function(input, output, session) {
                     name = gene_list,
                     original_order = seq_along(gene_list)
                 ), by = 'name') %>%
-                arrange(original_order) %>%
-                select(name, type, Symbol, Synonyms,
-                       description, type_of_gene,
-                       map_location, original_order)
+                arrange(original_order)
         } else if (input$orderby == 'ncbi') {
             search.res = search.res %>%
-                arrange(order) %>%
-                select(name, type, Symbol, Synonyms,
-                       description, type_of_gene,
-                       map_location, order)
+                arrange(order)
         } else if (input$orderby == 'pubmed') {
             search.res = search.res %>%
                 arrange(pm_rank) %>%
-                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')')) %>%
-                select(name, type, Symbol, Synonyms,
-                       description, type_of_gene,
-                       map_location, pubmed)
+                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')'))
         } else if (input$orderby == 'pubmed_immuno') {
             search.res = search.res %>%
                 arrange(pm_rank_immuno) %>%
                 mutate(pubmed = paste0(pm_rank_immuno,
-                                       ' (', pm_count_immuno, ')')) %>%
-                select(name, type, Symbol, Synonyms,
-                       description, type_of_gene,
-                       map_location, pubmed)
+                                       ' (', pm_count_immuno, ')'))
         } else if (input$orderby == 'pubmed_tumor') {
             search.res = search.res %>%
                 arrange(pm_rank_tumor) %>%
                 mutate(pubmed = paste0(pm_rank_tumor,
-                                       ' (', pm_count_tumor, ')')) %>%
-                select(name, type, Symbol, Synonyms,
-                       description, type_of_gene,
-                       map_location, pubmed)
+                                       ' (', pm_count_tumor, ')'))
         }
-        search.res
+        rv$summary = ''
+        rv$pmid = integer()
+        search.res %>%
+            select(-c(dbXrefs, chromosome,
+                      Symbol_from_nomenclature_authority,
+                      Full_name_from_nomenclature_authority,
+                      Other_designations,
+                      starts_with('pm_')))
+    })
+
+    get_selected_geneid <- reactive({
+        if (!is.null(input$gene_table_row_last_clicked)) {
+            row.idx = input$gene_table_row_last_clicked
+            get_ordered_table()[['GeneID']][row.idx]
+        } else {
+            return(NULL)
+        }
+    })
+
+    output$gene_table = DT::renderDataTable({
+        get_ordered_table() %>%
+            select(-GeneID)
     },
     rownames = FALSE,
     server = FALSE,
@@ -191,10 +195,10 @@ shinyServer(function(input, output, session) {
                      text = 'Download'
                  ),
                  list(extend = 'colvis',
-                      columns = c(0,1,3,4,5,6,7))
+                      columns = c(0,1,3,4,5,6,7,8))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(0,1,5,6)))
+                               targets = c(0,1,5,6,8)))
     ))
 
     output$unmatched <- renderText({
@@ -247,6 +251,20 @@ shinyServer(function(input, output, session) {
         }
     })
 
+    output$gene_summary <- renderText({
+        rv$summary
+    })
+
+    output$pmid <- renderUI({
+        tags$ul(lapply(rv$pmid, function(id) {
+            tags$li(tags$a(
+                as.character(id),
+                target = '_blank',
+                href = paste('https://www.ncbi.nlm.nih.gov/pubmed',
+                       as.character(id), sep = '/')))
+        }))
+    })
+
     observeEvent(input$clear, {
         rv$data <- NULL
         reset("gene_list_file")
@@ -268,4 +286,29 @@ shinyServer(function(input, output, session) {
                             value = paste(readLines('example/2.txt'),
                                           collapse = '\n'))
     })
+
+    # update gene summary text when a gene is selected
+    observe(
+        if (!is.null(input$gene_table_row_last_clicked)) {
+            row.idx = input$gene_table_row_last_clicked
+            rv$summary = get_ordered_table()$Summary[row.idx]
+
+            gene_id = get_selected_geneid()
+            if (input$orderby == 'pubmed') {
+                rv$pmid = unname(
+                    unlist((gene2pubmed %>%
+                                filter(GeneID == gene_id))[['PubMed_ID']]))
+            } else if (input$orderby == 'pubmed_immuno') {
+                rv$pmid = unname(
+                    unlist((gene2pubmed.immuno %>%
+                                filter(GeneID == gene_id))[['PubMed_ID']]))
+            } else if (input$orderby == 'pubmed_tumor') {
+                rv$pmid = unname(
+                    unlist((gene2pubmed.tumor %>%
+                                filter(GeneID == gene_id))[['PubMed_ID']]))
+            } else {
+                rv$pmid = integer()
+            }
+        }
+    )
 })

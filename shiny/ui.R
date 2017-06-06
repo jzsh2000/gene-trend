@@ -63,7 +63,14 @@ shinyUI(fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-            uiOutput('output_panel')
+            uiOutput('output_panel'),
+            hr(),
+            fluidRow(
+                column(width = 6,
+                       textOutput('gene_summary')),
+                column(width = 6,
+                       uiOutput('pmid'))
+            )
         )
     )
 ))
