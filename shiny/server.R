@@ -251,9 +251,11 @@ shinyServer(function(input, output, session) {
         }
     })
 
-    output$gene_summary <- renderText({
-        rv$summary
-    })
+    output$gene_summary <- renderUI(
+        tags$div(class = "panel panel-default",
+                 tags$div(class = 'panel-heading', 'Gene Summary'),
+                 tags$div(class = "panel-body", rv$summary))
+    )
 
     output$pmid <- renderUI({
         get_pmid_link <- function(pmid_list) {
@@ -266,17 +268,22 @@ shinyServer(function(input, output, session) {
             }))
         }
         if (length(rv$pmid) > 20) {
-            tagList(
-                tags$a('See all citations in PubMed',
-                       href = paste0('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=',
-                                     get_selected_geneid())),
-                get_pmid_link(sort(rv$pmid, decreasing = TRUE)[1:20])
-            )
+            tags$div(class = "panel panel-default",
+                     tags$div(class = 'panel-heading', 'Citations in PubMed'),
+                     tags$div(class = "panel-body",
+                              tagList(
+                                  tags$a('See all citations in PubMed',
+                                         href = paste0('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=',
+                                                       get_selected_geneid())),
+                                  get_pmid_link(sort(rv$pmid, decreasing = TRUE)[1:20])
+                              )))
+
         } else {
-            tagList(
-                tags$p('Citations in PubMed:'),
-                get_pmid_link(sort(rv$pmid, decreasing = TRUE))
-            )
+            tags$div(class = "panel panel-default",
+                     tags$div(class = 'panel-heading', 'Citations in PubMed'),
+                     tags$div(class = "panel-body",
+                                  get_pmid_link(sort(rv$pmid, decreasing = TRUE))
+                              ))
         }
 
     })
@@ -310,11 +317,7 @@ shinyServer(function(input, output, session) {
             rv$summary = get_ordered_table()$Summary[row.idx]
 
             gene_id = get_selected_geneid()
-            if (input$orderby == 'pubmed') {
-                rv$pmid = unname(
-                    unlist((gene2pubmed %>%
-                                filter(GeneID == gene_id))[['PubMed_ID']]))
-            } else if (input$orderby == 'pubmed_immuno') {
+            if (input$orderby == 'pubmed_immuno') {
                 rv$pmid = unname(
                     unlist((gene2pubmed.immuno %>%
                                 filter(GeneID == gene_id))[['PubMed_ID']]))
@@ -323,7 +326,9 @@ shinyServer(function(input, output, session) {
                     unlist((gene2pubmed.tumor %>%
                                 filter(GeneID == gene_id))[['PubMed_ID']]))
             } else {
-                rv$pmid = integer()
+                rv$pmid = unname(
+                    unlist((gene2pubmed %>%
+                                filter(GeneID == gene_id))[['PubMed_ID']]))
             }
         }
     )

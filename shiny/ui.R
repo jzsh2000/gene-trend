@@ -67,7 +67,7 @@ shinyUI(fluidPage(
             hr(),
             fluidRow(
                 column(width = 6,
-                       textOutput('gene_summary')),
+                       uiOutput('gene_summary')),
                 column(width = 6,
                        uiOutput('pmid'))
             )
