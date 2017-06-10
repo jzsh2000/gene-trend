@@ -40,7 +40,10 @@ shinyServer(function(input, output, session) {
             gene_info = gene_info,
             symbol2id = symbol2id,
             synonym2id = synonym2id,
-            ensembl2id = ensembl2id
+            ensembl2id = ensembl2id,
+            gene2pubmed = gene2pubmed,
+            gene2pubmed.immuno = gene2pubmed.immuno,
+            gene2pubmed.tumor = gene2pubmed.tumor
             ))
     })
 
@@ -318,14 +321,17 @@ shinyServer(function(input, output, session) {
 
             gene_id = get_selected_geneid()
             if (input$orderby == 'pubmed_immuno') {
+                gene2pubmed.immuno = get_species()[['gene2pubmed.immuno']]
                 rv$pmid = unname(
                     unlist((gene2pubmed.immuno %>%
                                 filter(GeneID == gene_id))[['PubMed_ID']]))
             } else if (input$orderby == 'pubmed_tumor') {
+                gene2pubmed.tumor = get_species()[['gene2pubmed.tumor']]
                 rv$pmid = unname(
                     unlist((gene2pubmed.tumor %>%
                                 filter(GeneID == gene_id))[['PubMed_ID']]))
             } else {
+                gene2pubmed = get_species()[['gene2pubmed']]
                 rv$pmid = unname(
                     unlist((gene2pubmed %>%
                                 filter(GeneID == gene_id))[['PubMed_ID']]))
