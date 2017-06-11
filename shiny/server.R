@@ -230,6 +230,41 @@ shinyServer(function(input, output, session) {
         }
     })
 
+    output$gene_info_database <- DT::renderDataTable({
+        gene_info = get_species()[['gene_info']] %>%
+            mutate(Symbol =
+                       paste0('<a ',
+                              'href="http://www.ncbi.nlm.nih.gov/gene/',
+                              GeneID, '" ',
+                              'target=_black ',
+                              '>', Symbol,'</a>'))
+
+        if (input$orderby == 'ncbi') {
+            gene_info = gene_info %>%
+                arrange(order)
+        } else if (input$orderby == 'pubmed') {
+            gene_info = gene_info %>%
+                arrange(pm_rank) %>%
+                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')'))
+        } else if (input$orderby == 'pubmed_immuno') {
+            gene_info = gene_info %>%
+                arrange(pm_rank_immuno) %>%
+                mutate(pubmed = paste0(pm_rank_immuno,
+                                       ' (', pm_count_immuno, ')'))
+        } else if (input$orderby == 'pubmed_tumor') {
+            gene_info = gene_info %>%
+                arrange(pm_rank_tumor) %>%
+                mutate(pubmed = paste0(pm_rank_tumor,
+                                       ' (', pm_count_tumor, ')'))
+        }
+        gene_info %>%
+            select(Symbol, Synonyms, description)
+    },
+    escape = FALSE,
+    rownames = FALSE,
+    selection = 'single'
+    )
+
     output$output_panel <- renderUI({
         if (length(get_unmatched()) == 0) {
             tabsetPanel(
@@ -237,6 +272,10 @@ shinyServer(function(input, output, session) {
                 tabPanel(
                     title = "gene table",
                     dataTableOutput("gene_table")
+                ),
+                tabPanel(
+                    title = 'database',
+                    dataTableOutput("gene_info_database")
                 )
             )
         } else {
@@ -249,6 +288,10 @@ shinyServer(function(input, output, session) {
                 tabPanel(
                     title = "unmatched",
                     verbatimTextOutput('unmatched')
+                ),
+                tabPanel(
+                    title = 'database',
+                    dataTableOutput("gene_info_database")
                 )
             )
         }
