@@ -142,7 +142,8 @@ shinyServer(function(input, output, session) {
                 arrange(original_order)
         } else if (input$orderby == 'ncbi') {
             search.res = search.res %>%
-                arrange(order)
+                mutate(ncbi_order = order) %>%
+                arrange(ncbi_order)
         } else if (input$orderby == 'pubmed') {
             search.res = search.res %>%
                 arrange(pm_rank) %>%
@@ -164,7 +165,7 @@ shinyServer(function(input, output, session) {
             select(-c(dbXrefs, chromosome,
                       Symbol_from_nomenclature_authority,
                       Full_name_from_nomenclature_authority,
-                      Other_designations,
+                      Other_designations, order,
                       starts_with('pm_')))
     })
 
@@ -201,7 +202,7 @@ shinyServer(function(input, output, session) {
                       columns = c(0,1,3,4,5,6,7,8))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(0,1,5,6,8)))
+                               targets = c(0,1,4,6,7)))
     ))
 
     output$unmatched <- renderText({
