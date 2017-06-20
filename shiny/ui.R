@@ -16,7 +16,7 @@ shinyUI(fluidPage(
     useShinyjs(),
 
     # Application title
-    titlePanel("Gene ID conversion"),
+    titlePanel("Gene ID conversion (version: 2017-03-12)"),
 
     # Sidebar with a slider input for number of bins
     sidebarLayout(
