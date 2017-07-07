@@ -1,0 +1,5 @@
+.fixed-panel {
+    min-height: 100px;
+    max-height: 10rem;
+    overflow-y: scroll;
+}

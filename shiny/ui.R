@@ -14,7 +14,9 @@ library(DT)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     useShinyjs(),
-
+    tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
+    ),
     # Application title
     titlePanel("Gene ID conversion (version: 2017-03-12)"),
 

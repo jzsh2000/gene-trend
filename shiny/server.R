@@ -301,7 +301,8 @@ shinyServer(function(input, output, session) {
     output$gene_summary <- renderUI(
         tags$div(class = "panel panel-default",
                  tags$div(class = 'panel-heading', 'Gene Summary'),
-                 tags$div(class = "panel-body", rv$summary))
+                 tags$div(class = "panel-body fixed-panel",
+                          rv$summary))
     )
 
     output$pmid <- renderUI({
@@ -317,7 +318,7 @@ shinyServer(function(input, output, session) {
         if (length(rv$pmid) > 20) {
             tags$div(class = "panel panel-default",
                      tags$div(class = 'panel-heading', 'Citations in PubMed'),
-                     tags$div(class = "panel-body",
+                     tags$div(class = "panel-body fixed-panel",
                               tagList(
                                   tags$a('See all citations in PubMed',
                                          href = paste0('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=',
@@ -328,7 +329,7 @@ shinyServer(function(input, output, session) {
         } else {
             tags$div(class = "panel panel-default",
                      tags$div(class = 'panel-heading', 'Citations in PubMed'),
-                     tags$div(class = "panel-body",
+                     tags$div(class = "panel-body fixed-panel",
                                   get_pmid_link(sort(rv$pmid, decreasing = TRUE))
                               ))
         }
