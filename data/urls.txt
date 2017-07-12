@@ -1,0 +1,8 @@
+pubmed baseline 2017 (total size: 21 GB)
+ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/
+
+MeSH Tree List with Headings 2017
+https://www.nlm.nih.gov/mesh/2017/download/2017MeshTree.txt
+
+MeSH Tree List with Headings and Scope Notes 2017
+https://www.nlm.nih.gov/mesh/2017/download/MeshTreeHierarchyWithScopeNotes.xlsx
