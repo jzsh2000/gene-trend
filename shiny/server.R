@@ -16,7 +16,9 @@ library(htmltools)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
-    rv <- reactiveValues(data = NULL, summary = '', pmid = integer())
+    rv <- reactiveValues(data = NULL,
+                         summary = '',
+                         pmid = integer())
     observe({
         req(input$gene_list_file)
         rv$data <- paste(readLines(input$gene_list_file$datapath),
@@ -202,7 +204,8 @@ shinyServer(function(input, output, session) {
                       columns = c(0,1,3,4,5,6,7,8))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(0,1,4,6,7)))
+                               targets = c(0,1,4,6,7))),
+        scrollX = TRUE
     ))
 
     output$unmatched <- renderText({
@@ -272,7 +275,14 @@ shinyServer(function(input, output, session) {
                 id = 'output_panel',
                 tabPanel(
                     title = "gene table",
-                    dataTableOutput("gene_table")
+                    fluidRow(
+                        column(width = 8,
+                               dataTableOutput("gene_table")),
+                        column(width = 4,
+                               uiOutput('gene_summary'),
+                               hr(),
+                               uiOutput('pmid'))
+                    )
                 ),
                 tabPanel(
                     title = 'database',
@@ -284,7 +294,14 @@ shinyServer(function(input, output, session) {
                 id = 'output_panel',
                 tabPanel(
                     title = "gene table",
-                    dataTableOutput("gene_table")
+                    fluidRow(
+                        column(width = 8,
+                               dataTableOutput("gene_table")),
+                        column(width = 4,
+                               uiOutput('gene_summary'),
+                               hr(),
+                               uiOutput('pmid'))
+                    )
                 ),
                 tabPanel(
                     title = "unmatched",
@@ -301,11 +318,43 @@ shinyServer(function(input, output, session) {
     output$gene_summary <- renderUI(
         tags$div(class = "panel panel-default",
                  tags$div(class = 'panel-heading', 'Gene Summary'),
-                 tags$div(class = "panel-body fixed-panel",
-                          rv$summary))
+                 tags$div(class = "panel-body",
+                          ifelse(rv$summary == '',
+                                 'no gene summary',
+                                 rv$summary)
+                          )
+        )
     )
 
     output$pmid <- renderUI({
+        if (length(rv$pmid) == 0) {
+            tags$div(
+                class = "container",
+                tags$span('no citations')
+            )
+        }
+        else if (length(rv$pmid) < 100) {
+            tags$div(
+                class = "container",
+                tags$a(paste('See', length(rv$pmid), 'citations in PubMed'),
+                       href = paste0('https://www.ncbi.nlm.nih.gov/pubmed/',
+                                    paste(rv$pmid, collapse = ','))
+                       )
+            )
+        } else {
+            selected_id = sort(rv$pmid, decreasing = TRUE)[1:20]
+            tags$div(
+                class = "container",
+                tags$a(paste('See over 100 citations in PubMed'),
+                       href = paste0('https://www.ncbi.nlm.nih.gov/pubmed/',
+                                     paste(selected_id, collapse = ','))
+                       )
+            )
+        }
+
+    })
+
+    output$pmid_panel <- renderUI({
         get_pmid_link <- function(pmid_list) {
             tags$ul(lapply(pmid_list, function(id) {
                 tags$li(tags$a(

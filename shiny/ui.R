@@ -23,6 +23,7 @@ shinyUI(fluidPage(
     # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
+            width = 3,
             radioButtons(
                 inputId = 'species',
                 label = 'Species',
@@ -65,14 +66,8 @@ shinyUI(fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-            uiOutput('output_panel'),
-            hr(),
-            fluidRow(
-                column(width = 6,
-                       uiOutput('gene_summary')),
-                column(width = 6,
-                       uiOutput('pmid'))
-            )
+            width = 9,
+            uiOutput('output_panel')
         )
     )
 ))
