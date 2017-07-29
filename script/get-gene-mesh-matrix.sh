@@ -49,5 +49,20 @@ else
     echo "Generating $outdir/pubmed-gene-mesh.txt"
     join $outdir/pubmed-gene.filtered.txt \
         data/pubmed/data/pubmed/clean_data/pubmed-mesh.txt \
+        | tr ' ' '\t' \
         > $outdir/pubmed-gene-mesh.txt
 fi
+
+# output example:
+# pmid | txid | gene_id | mesh_id | major_topic (Y/N)
+# ---------------------------------------------------
+# 100	10090	69192	D000818	N
+# 100	10090	69192	D001769	N
+# 100	10090	69192	D002239	Y
+# 100	10090	69192	D002417	N
+# 100	10090	69192	D002418	Y
+# 100	10090	69192	D004195	Y
+# 100	10090	69192	D006579	N
+# 100	10090	69192	D006863	N
+# 100	10090	69192	D008214	N
+# 100	10090	69192	D008247	Y
