@@ -1,0 +1,3 @@
+[submodule "data/pubmed"]
+	path = data/pubmed
+	url = git@github.com:jzsh2000/pubmed.git
