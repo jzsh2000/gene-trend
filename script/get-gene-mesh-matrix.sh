@@ -43,14 +43,16 @@ fi
 
 rm $tmpfile
 
-if [ ! -f data/pubmed/data/pubmed/clean_data/pubmed-mesh.txt ]; then
-    echo 'ERROR: please generate "pubmed-mesh.txt" file first'
-else
-    echo "Generating $outdir/pubmed-gene-mesh.txt"
-    join $outdir/pubmed-gene.filtered.txt \
-        data/pubmed/data/pubmed/clean_data/pubmed-mesh.txt \
-        | tr ' ' '\t' \
-        > $outdir/pubmed-gene-mesh.txt
+if [ ! -f $outdir/pubmed-gene-mesh.txt ]; then
+    if [ ! -f data/pubmed/data/pubmed/clean_data/pubmed-mesh.txt ]; then
+        echo 'ERROR: please generate "pubmed-mesh.txt" file first'
+    else
+        echo "Generating $outdir/pubmed-gene-mesh.txt"
+        join $outdir/pubmed-gene.filtered.txt \
+            data/pubmed/data/pubmed/clean_data/pubmed-mesh.txt \
+            | tr ' ' '\t' \
+            > $outdir/pubmed-gene-mesh.txt
+    fi
 fi
 
 # output example:
@@ -66,3 +68,23 @@ fi
 # 100	10090	69192	D006863	N
 # 100	10090	69192	D008214	N
 # 100	10090	69192	D008247	Y
+
+# get gene-mesh link for top species
+for species in $(cut -f1 data/current/tax_id.top.txt | head -5)
+do
+    echo "Species: $species"
+    mkdir -p $outdir/$species
+    cat $outdir/pubmed-gene-mesh.txt \
+        | awk -v s=$species '$2==s{print $3,$4}' \
+        | sort \
+        | uniq -c \
+        | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
+        > $outdir/$species/gene-mesh.txt
+
+    cat $outdir/pubmed-gene-mesh.txt \
+        | awk -v s=$species '$2==s && $5=="Y"{print $3,$4}' \
+        | sort \
+        | uniq -c \
+        | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
+        > $outdir/$species/gene-mesh.major.txt
+done
