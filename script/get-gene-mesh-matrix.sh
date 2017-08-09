@@ -87,4 +87,18 @@ do
         | uniq -c \
         | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
         > $outdir/$species/gene-mesh.major.txt
+
+    cat $outdir/$species/gene-mesh.txt \
+        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+        | sort -k1b,1 \
+        | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
+        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+        > $outdir/$species/gene-mesh-disease.txt
+
+    cat $outdir/$species/gene-mesh.major.txt \
+        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+        | sort -k1b,1 \
+        | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
+        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+        > $outdir/$species/gene-mesh-disease.major.txt
 done
