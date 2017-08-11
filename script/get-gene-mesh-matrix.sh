@@ -74,31 +74,39 @@ for species in $(cut -f1 data/current/tax_id.top.txt | head -5)
 do
     echo "Species: $species"
     mkdir -p $outdir/$species
-    cat $outdir/pubmed-gene-mesh.txt \
-        | awk -v s=$species '$2==s{print $3,$4}' \
-        | sort \
-        | uniq -c \
-        | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
-        > $outdir/$species/gene-mesh.txt
+    if [ ! -f $outdir/$species/gene-mesh.txt ]; then
+        cat $outdir/pubmed-gene-mesh.txt \
+            | awk -v s=$species '$2==s{print $3,$4}' \
+            | sort \
+            | uniq -c \
+            | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
+            > $outdir/$species/gene-mesh.txt
+    fi
 
-    cat $outdir/pubmed-gene-mesh.txt \
-        | awk -v s=$species '$2==s && $5=="Y"{print $3,$4}' \
-        | sort \
-        | uniq -c \
-        | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
-        > $outdir/$species/gene-mesh.major.txt
+    if [ ! -f $outdir/$species/gene-mesh.major.txt ]; then
+        cat $outdir/pubmed-gene-mesh.txt \
+            | awk -v s=$species '$2==s && $5=="Y"{print $3,$4}' \
+            | sort \
+            | uniq -c \
+            | awk 'BEGIN{OFS="\t"}{print $2,$3,$1}' \
+            > $outdir/$species/gene-mesh.major.txt
+    fi
 
-    cat $outdir/$species/gene-mesh.txt \
-        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
-        | sort -k1b,1 \
-        | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
-        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
-        > $outdir/$species/gene-mesh-disease.txt
+    if [ ! -f $outdir/$species/gene-mesh-disease.txt ]; then
+        cat $outdir/$species/gene-mesh.txt \
+            | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+            | sort -k1b,1 \
+            | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
+            | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+            > $outdir/$species/gene-mesh-disease.txt
+    fi
 
-    cat $outdir/$species/gene-mesh.major.txt \
-        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
-        | sort -k1b,1 \
-        | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
-        | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
-        > $outdir/$species/gene-mesh-disease.major.txt
+    if [ ! -f $outdir/$species/gene-mesh-disease.major.txt ]; then
+        cat $outdir/$species/gene-mesh.major.txt \
+            | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+            | sort -k1b,1 \
+            | join - <(sort data/pubmed/data/mesh/branch/C.txt) \
+            | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
+            > $outdir/$species/gene-mesh-disease.major.txt
+        fi
 done
