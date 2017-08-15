@@ -2,10 +2,10 @@
 find CD molecules according to gene official names and synonyms, no output
 
 ## collectPmid.sh
-merge pubmed ID files to one file (not used anymore)
+merge pubmed ID files to one file (legacy code)
 
 ## download-gene-info-xml.sh
-download NCBI gene xml for human and mouse (not used anymore)
+download NCBI gene xml for human and mouse<br/>
 it would be better to download gene asn.1 format and convert it to xml
 
 e.g.
@@ -19,13 +19,30 @@ wget ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/ASN_BINARY/Mammalia/Homo_sapiens.ags.g
 ```
 
 ## efetch-pubmed.sh
+get the minimal pubmed ID in each year, started from 1990 (legacy code)
+
 ## efetch-pubmed2.sh
+get the pubdate of 1/10000 of all pubmed articles (legacy code)
+
 ## efetch-pubmed3.sh
+get the pubdate of 1/1000 of all pubmed articles (legacy code)
+
 ## efetch-taxonomy.sh
+get taxonomy information for species in gene2pubmed file
+
 ## extract-summary.sh
+get human and mouse gene summaries in NCBI gene xml files
+
 ## genGeneNames.sh
+paste gene ID and gene name to one file (legacy code)
+
 ## genGeneToPubmed.sh
+home-made gene2pubmed (legacy code)<br/>
+now use gene2pubmed file from NCBI FTP site
+
 ## genPubmedDate.sh
+paste pubmed ID and pubmed pubdate to one file (legacy code)
+
 ## genRDS.R
 ## gene-author.sh
 ## gene-families-human.R
