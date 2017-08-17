@@ -18,18 +18,40 @@
 # Filter out data of human TP53 gene
 # cat data/current/gene-pdat.txt | awk '$1=="9606" && $2=="7157"'
 
-zcat data/current/gene2pubmed.gz \
-    | awk -F'\t' 'BEGIN{OFS="\t"}NR>1{print $3,$1,$2}' \
-    | sort -k1b,1 \
-    | join - data/pubmed/data/pubmed/clean_data/pubmed-pdat.txt \
-    | tr ' ' '\t' \
-    | cut -f2-4 \
-    | awk -F'\t' 'BEGIN{OFS="\t"}
-        {
-            split($3,d,"-");
-            printf "%s\t%s\t%s-%s\n",$1,$2,d[1],d[2]
-        }' \
-    | sort \
-    | uniq -c \
-    | awk 'BEGIN{OFS="\t"}{print $2,$3,$4,$1}' \
-    > data/current/gene-pdat.txt
+if [ ! -f data/current/gene-pdat.month.txt ]; then
+    echo "gene-pdat by month"
+    zcat data/current/gene2pubmed.gz \
+        | awk -F'\t' 'BEGIN{OFS="\t"}NR>1{print $3,$1,$2}' \
+        | sort -k1b,1 \
+        | join - data/pubmed/data/pubmed/clean_data/pubmed-pdat.txt \
+        | tr ' ' '\t' \
+        | cut -f2-4 \
+        | awk -F'\t' 'BEGIN{OFS="\t"}
+            {
+                split($3,d,"-");
+                printf "%s\t%s\t%s-%s\n",$1,$2,d[1],d[2]
+            }' \
+        | sort \
+        | uniq -c \
+        | awk 'BEGIN{OFS="\t"}{print $2,$3,$4,$1}' \
+        > data/current/gene-pdat.month.txt
+fi
+
+if [ ! -f data/current/gene-pdat.year.txt ];then
+    echo "gene-pdat by year"
+    zcat data/current/gene2pubmed.gz \
+        | awk -F'\t' 'BEGIN{OFS="\t"}NR>1{print $3,$1,$2}' \
+        | sort -k1b,1 \
+        | join - data/pubmed/data/pubmed/clean_data/pubmed-pdat.txt \
+        | tr ' ' '\t' \
+        | cut -f2-4 \
+        | awk -F'\t' 'BEGIN{OFS="\t"}
+            {
+                split($3,d,"-");
+                printf "%s\t%s\t%s\n",$1,$2,d[1]
+            }' \
+        | sort \
+        | uniq -c \
+        | awk 'BEGIN{OFS="\t"}{print $2,$3,$4,$1}' \
+        > data/current/gene-pdat.year.txt
+fi
