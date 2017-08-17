@@ -1,9 +1,6 @@
 ## CD-molecules.R
 find CD molecules according to gene official names and synonyms, no output
 
-## collectPmid.sh
-merge pubmed ID files to one file (legacy code)
-
 ## download-gene-info-xml.sh
 download NCBI gene xml for human and mouse<br/>
 it would be better to download gene asn.1 format and convert it to xml
@@ -18,15 +15,6 @@ wget ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/ASN_BINARY/Mammalia/Homo_sapiens.ags.g
 ./gene2xml -i Homo_sapiens.ags.gz -c T -o Homo_sapiens.xml
 ```
 
-## efetch-pubmed.sh
-get the minimal pubmed ID in each year, started from 1990 (legacy code)
-
-## efetch-pubmed2.sh
-get the pubdate of 1/10000 of all pubmed articles (legacy code)
-
-## efetch-pubmed3.sh
-get the pubdate of 1/1000 of all pubmed articles (legacy code)
-
 ## efetch-taxonomy.sh
 get taxonomy information for species in gene2pubmed file
 
@@ -36,24 +24,6 @@ get human and mouse gene summaries in NCBI gene xml files
 output format (2-column tsv)
 * gene id
 * gene summary
-
-## genGeneNames.sh
-paste gene ID and gene name to one file (legacy code)
-
-## genGeneToPubmed.sh
-home-made gene2pubmed (legacy code)<br/>
-now use gene2pubmed file from NCBI FTP site
-
-## genPubmedDate.sh
-paste pubmed ID and pubmed pubdate to one file (legacy code)
-
-## genRDS.R
-generate dataframe with four columns and save it as RDS file (legacy code)
-
-* gene id
-* gene name
-* pubmed id
-* pubmed pubdate
 
 ## gene-author.sh
 count number of times an author contributes to a gene (only consider first
@@ -113,21 +83,6 @@ output format (3-column tsv)
 ## get-top-species.sh
 sort species in gene2pubmed file by number of occurance
 
-## getArticleInfo.sh
-download pubmed article records related to genes of a specified species in
-medline format, and extract entrez date (legacy code)
-
-## getGeneInfo.sh
-download detailed information for genes of a specified species, and extract
-gene names (legacy code)
-
-## getGeneList.sh
-get gene list for a specified species (legacy code)
-
-## linkGeneToPubmed.sh
-get ID of pubmed article related to each gene for a specified species (legacy
-code)
-
 ## mesh-id-to-root.sh
 map MeSH id to its top branch, and count number of MeSH terms in each top branch
 
@@ -143,9 +98,3 @@ get ID of pubmed articles matched to a MeSH subheading
 
 ## search-pubmed-mesh.sh
 get ID of pubmed articles matched to a MeSH term
-
-## searchDendriticCell.sh
-get ID of pubmed articles related to dendritics cells
-
-## split-gene-info.sh
-get gene\_info and gene2pubmed file for human and mouse part (legacy code)
