@@ -55,3 +55,13 @@ if [ ! -f data/current/gene-pdat.year.txt ];then
         | awk 'BEGIN{OFS="\t"}{print $2,$3,$4,$1}' \
         > data/current/gene-pdat.year.txt
 fi
+
+cat data/current/gene-pdat.year.txt \
+    | awk '$1=="9606"' \
+    | cut -f2-4 \
+    > data/current/Homo_sapiens.gene2pdat
+
+cat data/current/gene-pdat.year.txt \
+    | awk '$1=="10090"' \
+    | cut -f2-4 \
+    > data/current/Mus_musculus.gene2pdat
