@@ -46,10 +46,10 @@ shinyUI(fluidPage(
         sliderInput(
             inputId = 'gene_num',
             label = 'Number of genes',
-            min = 10,
+            min = 5,
             max = 100,
             step = 5,
-            value = 20
+            value = 10
         )
         # actionButton(
         #     inputId = 'update',
