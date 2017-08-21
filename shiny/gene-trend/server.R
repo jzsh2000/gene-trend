@@ -13,14 +13,28 @@ library(tidyverse)
 load('data/human-mouse.Rdata')
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     get_input_value <- reactive({
         list(species = input$species,
              date = input$date,
              gene_num = input$gene_num)
-    }) %>% debounce(1500)
+    }) %>% debounce(800)
 
-    output$top_gene <- renderDataTable({
+    observeEvent(input$previous, {
+        if (input$date[1] > 1991 && input$date[2] > 1991) {
+            updateSliderInput(session, inputId = 'date',
+                              value = c(input$date[1] - 1, input$date[2] - 1))
+        }
+    })
+
+    observeEvent(input$nextyear, {
+        if (input$date[1] < 2016 && input$date[2] < 2016) {
+            updateSliderInput(session, inputId = 'date',
+                              value = c(input$date[1] + 1, input$date[2] + 1))
+        }
+    })
+
+    output$top_gene <- DT::renderDataTable({
 
         if (get_input_value()$species == "human") {
             gene_info = human_gene_info
@@ -42,5 +56,20 @@ shinyServer(function(input, output) {
             top_n(get_input_value()$gene_num) %>%
             left_join(gene_info, by = 'GeneID') %>%
             select(GeneID, Symbol, Synonyms, description, count)
-    })
+    },
+    selection = 'single',
+    extension = 'Buttons',
+    options = list(
+        dom = 'Bfrtip',
+        buttons = list('copy',
+                       list(
+                           extend = 'collection',
+                           buttons = c('csv', 'excel', 'pdf'),
+                           text = 'Download'
+                       ),
+                       list(extend = 'colvis',
+                            columns = c(1,3,4,5))
+        ),
+        columnDefs = list(list(visible = FALSE, targets = c(3)))
+    ))
 })

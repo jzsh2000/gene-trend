@@ -33,6 +33,16 @@ shinyUI(fluidPage(
             max = 2016,
             value = c(2016,2016)
         ),
+        fluidRow(
+            column(width = 4, actionButton('previous', label = '<--')),
+            column(
+                width = 4,
+                actionButton('nextyear', label = '-->',
+                             style = "float:right"),
+                offset = 4
+            )
+        ),
+        tags$hr(),
         sliderInput(
             inputId = 'gene_num',
             label = 'Number of genes',
