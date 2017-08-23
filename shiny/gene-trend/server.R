@@ -70,6 +70,7 @@ shinyServer(function(input, output, session) {
         dat_now %>%
             left_join(gene_info, by = 'GeneID') %>%
             left_join(dat_prev, by = 'GeneID') %>%
+            replace_na(list(rank_prev = max(.$rank_prev, na.rm = TRUE) + 1)) %>%
             mutate(rank_diff = rank_prev - rank) %>%
             select(GeneID, Symbol, Synonyms, description, count, rank_diff) %>%
             rename(Description = description, Articles = count) %>%
