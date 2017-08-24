@@ -14,7 +14,7 @@ library(DT)
 shinyUI(fluidPage(
 
   # Application title
-  titlePanel("Gene Trend (~> - 2016)"),
+  titlePanel("Gene Trend (~1991 -> 2016)"),
 
   # Sidebar with a slider input for number of bins
   sidebarLayout(
