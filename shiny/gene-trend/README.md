@@ -26,3 +26,8 @@ Top mouse genes of 2016:
 8. [Sox2](https://www.ncbi.nlm.nih.gov/gene/20674) (SRY (sex determining region Y)-box 2)
 9. [Pten](https://www.ncbi.nlm.nih.gov/gene/19211) (phosphatase and tensin homolog)
 10. [Tlr4](https://www.ncbi.nlm.nih.gov/gene/21898) (toll-like receptor 4)
+
+Live Demo
+=========
+This application is deployed on `shinyapps.io`, you could access the following
+link to test the application: <https://jzsh2000.shinyapps.io/gene-trend>
