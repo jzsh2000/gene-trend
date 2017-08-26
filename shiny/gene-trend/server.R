@@ -8,12 +8,27 @@
 #
 
 library(shiny)
+library(shinyjs)
 library(DT)
 library(tidyverse)
+# library(magrittr)
 load('data/human-mouse.Rdata')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
+
+    observeEvent(input$useall, {
+        if (input$useall == FALSE) {
+            enable('date')
+            enable('previous')
+            enable('nextyear')
+        } else {
+            disable('date')
+            disable('previous')
+            disable('nextyear')
+        }
+    })
+
     get_input_value <- reactive({
         list(species = input$species,
              date = input$date,
@@ -46,47 +61,64 @@ shinyServer(function(input, output, session) {
             gene_info = data_frame()
             gene2pdat = data_frame()
         }
-        year_bot = get_input_value()$date[1]
-        year_top = get_input_value()$date[2]
-        year_span = year_top - year_bot + 1
 
-        dat_now <- gene2pdat %>%
-            filter(year >= year_bot, year <= year_top) %>%
-            group_by(GeneID) %>%
-            summarise(count = sum(count)) %>%
-            mutate(rank = min_rank(desc(count))) %>%
-            arrange(desc(count)) %>%
-            filter(rank <= get_input_value()$gene_num)
+        if (input$useall) {
+            gene2pdat %>%
+                group_by(GeneID) %>%
+                summarise(count = sum(count)) %>%
+                mutate(rank = min_rank(desc(count))) %>%
+                arrange(desc(count)) %>%
+                filter(rank <= get_input_value()$gene_num) %>%
+                left_join(gene_info, by = 'GeneID') %>%
+                select(GeneID, Symbol, Synonyms, description, count) %>%
+                rename(Description = description, Articles = count) %>%
+                mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
+                                       GeneID, '" target=_blank>',
+                                       Symbol,'</a>')) %>%
+                mutate(`Ranking change` = '-')
+        } else {
+            year_bot = get_input_value()$date[1]
+            year_top = get_input_value()$date[2]
+            year_span = year_top - year_bot + 1
 
-        dat_prev = gene2pdat %>%
-            filter(year >= year_bot - year_span,
-                   year <= year_top - year_span) %>%
-            group_by(GeneID) %>%
-            summarise(count = sum(count)) %>%
-            mutate(rank_prev = min_rank(desc(count))) %>%
-            filter(GeneID %in% dat_now$GeneID) %>%
-            select(GeneID, rank_prev)
+            dat_now <- gene2pdat %>%
+                filter(year >= year_bot, year <= year_top) %>%
+                group_by(GeneID) %>%
+                summarise(count = sum(count)) %>%
+                mutate(rank = min_rank(desc(count))) %>%
+                arrange(desc(count)) %>%
+                filter(rank <= get_input_value()$gene_num)
 
-        dat_now %>%
-            left_join(gene_info, by = 'GeneID') %>%
-            left_join(dat_prev, by = 'GeneID') %>%
-            replace_na(list(rank_prev = max(.$rank_prev, na.rm = TRUE) + 1)) %>%
-            mutate(rank_diff = rank_prev - rank) %>%
-            select(GeneID, Symbol, Synonyms, description, count, rank_diff) %>%
-            rename(Description = description, Articles = count) %>%
-            mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
-                                   GeneID, '" target=_blank>',
-                                   Symbol,'</a>')) %>%
-            mutate(`Ranking change` = map_chr(rank_diff, function(x) {
-                if (x > 0) {
-                    paste0('<span style="color:green">▲</span>', x)
-                } else if (x < 0) {
-                    paste0('<span style="color:red">▼</span>', -x)
-                } else {
-                    return('-')
-                }
-            })) %>%
-            select(-rank_diff)
+            dat_prev = gene2pdat %>%
+                filter(year >= year_bot - year_span,
+                       year <= year_top - year_span) %>%
+                group_by(GeneID) %>%
+                summarise(count = sum(count)) %>%
+                mutate(rank_prev = min_rank(desc(count))) %>%
+                filter(GeneID %in% dat_now$GeneID) %>%
+                select(GeneID, rank_prev)
+
+            dat_now %>%
+                left_join(gene_info, by = 'GeneID') %>%
+                left_join(dat_prev, by = 'GeneID') %>%
+                replace_na(list(rank_prev = max(.$rank_prev, na.rm = TRUE) + 1)) %>%
+                mutate(rank_diff = rank_prev - rank) %>%
+                select(GeneID, Symbol, Synonyms, description, count, rank_diff) %>%
+                rename(Description = description, Articles = count) %>%
+                mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
+                                       GeneID, '" target=_blank>',
+                                       Symbol,'</a>')) %>%
+                mutate(`Ranking change` = map_chr(rank_diff, function(x) {
+                    if (x > 0) {
+                        paste0('<span style="color:green">▲</span>', x)
+                    } else if (x < 0) {
+                        paste0('<span style="color:red">▼</span>', -x)
+                    } else {
+                        return('-')
+                    }
+                })) %>%
+                select(-rank_diff)
+        }
     },
     escape = FALSE,
     selection = 'single',
@@ -101,7 +133,8 @@ shinyServer(function(input, output, session) {
                            text = 'Download'
                        ),
                        list(extend = 'colvis',
-                            columns = c(1,3,4,5,6))
+                            columns = c(1,3:6))
+                            # columns = c(1,3:ifelse(input$useall, 5, 6)))
         ),
         columnDefs = list(list(visible = FALSE, targets = c(3, 5)))
     ))

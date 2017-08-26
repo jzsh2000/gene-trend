@@ -12,6 +12,7 @@ library(DT)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
+  shinyjs::useShinyjs(),
 
   # Application title
   titlePanel("Gene Trend (~1991 -> 2016)"),
@@ -42,6 +43,7 @@ shinyUI(fluidPage(
                 offset = 4
             )
         ),
+        checkboxInput('useall', 'Use all', value = FALSE),
         tags$hr(),
         sliderInput(
             inputId = 'gene_num',
