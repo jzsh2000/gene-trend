@@ -74,7 +74,8 @@ shinyServer(function(input, output, session) {
                 rename(Description = description, Articles = count) %>%
                 mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
                                        GeneID, '" target=_blank>',
-                                       Symbol,'</a>')) %>%
+                                       Symbol,'</a>'),
+                       Articles = paste0('<a href="https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=', GeneID, '" target=_blank>', Articles, '</a>')) %>%
                 mutate(`Ranking change` = '-')
         } else {
             year_bot = get_input_value()$date[1]
