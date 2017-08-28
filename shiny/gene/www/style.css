@@ -3,3 +3,11 @@
     max-height: 10rem;
     overflow-y: scroll;
 }
+
+span.red-box {
+    border: 1px dotted red;
+}
+
+span.blue-box {
+    border: 1px dotted blue;
+}

@@ -129,3 +129,24 @@ walk2(unname(supported_species),
                gene2pubmed, gene2pubmed.immuno, gene2pubmed.tumor,
                file = rdata_file)
       })
+
+# ========== homologene (human and mouse)
+homologene <- read_tsv('data/current/homologene.data',
+         col_types = 'cccc__',
+         col_names = c('id', 'tax_id', 'gene_id', 'gene_name')) %>%
+    filter(tax_id %in% c('9606', '10090'))
+
+homologene_human <- homologene %>%
+    filter(tax_id == '9606') %>%
+    rename(human_gene_id = gene_id,
+           human_gene_name = gene_name) %>%
+    select(-tax_id)
+
+homologene_mouse <- homologene %>%
+    filter(tax_id == '10090') %>%
+    rename(mouse_gene_id = gene_id,
+           mouse_gene_name = gene_name) %>%
+    select(-tax_id)
+
+inner_join(homologene_human, homologene_mouse, by = 'id') %>%
+    write_rds('data/current/robj/human-mouse-homologene.rds')

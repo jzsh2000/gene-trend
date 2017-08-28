@@ -14,6 +14,8 @@ library(tidyverse)
 library(stringr)
 library(htmltools)
 
+homologene <- read_rds('robj/human-mouse-homologene.rds')
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
     rv <- reactiveValues(data = NULL,
@@ -27,6 +29,14 @@ shinyServer(function(input, output, session) {
 
     get_gene_list <- reactive({
         gene_list = str_split(input$gene, '\\n')[[1]] %>%
+            map_chr(str_trim)
+
+        # remove empty stings
+        str_subset(gene_list, '.')
+    }) %>% debounce(1000)
+
+    get_gene_list_2 <- reactive({
+        gene_list = str_split(input$gene_2, '\\n')[[1]] %>%
             map_chr(str_trim)
 
         # remove empty stings
@@ -432,4 +442,25 @@ shinyServer(function(input, output, session) {
             }
         }
     )
+
+    output$homologene <- DT::renderDataTable({
+        gene_list = get_gene_list_2()
+        # print(gene_list)
+
+        if (length(gene_list) == 0) {
+            tribble(~human_gene_name, ~mouse_gene_name)
+        } else {
+            if (input$species_2 == 'h2m') {
+                data_frame(human_gene_name = gene_list) %>%
+                    left_join(homologene, by = 'human_gene_name') %>%
+                    select(human_gene_name, mouse_gene_name) %>%
+                    replace_na(list(mouse_gene_name = ''))
+            } else {
+                data_frame(mouse_gene_name = gene_list) %>%
+                    left_join(homologene, by = 'mouse_gene_name') %>%
+                    select(mouse_gene_name, human_gene_name) %>%
+                    replace_na(list(human_gene_name = ''))
+            }
+        }
+    })
 })
