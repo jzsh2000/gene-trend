@@ -451,15 +451,22 @@ shinyServer(function(input, output, session) {
             tribble(~human_gene_name, ~mouse_gene_name)
         } else {
             if (input$species_2 == 'h2m') {
-                data_frame(human_gene_name = gene_list) %>%
+                out_df = data_frame(human_gene_name = gene_list) %>%
                     left_join(homologene, by = 'human_gene_name') %>%
                     select(human_gene_name, mouse_gene_name) %>%
                     replace_na(list(mouse_gene_name = ''))
             } else {
-                data_frame(mouse_gene_name = gene_list) %>%
+                out_df = data_frame(mouse_gene_name = gene_list) %>%
                     left_join(homologene, by = 'mouse_gene_name') %>%
                     select(mouse_gene_name, human_gene_name) %>%
                     replace_na(list(human_gene_name = ''))
+            }
+            if (input$hide_unmatched) {
+                out_df %>%
+                    filter(human_gene_name != '',
+                           mouse_gene_name != '')
+            } else {
+                out_df
             }
         }
     })

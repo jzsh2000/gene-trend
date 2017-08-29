@@ -96,7 +96,10 @@ shinyUI(fluidPage(
                         label = "Gene List",
                         height = '200px',
                         placeholder = 'Your awesome gene list'
-                    )
+                    ),
+                    checkboxInput('hide_unmatched',
+                                  label = 'Hide unmatched genes',
+                                  value = TRUE)
                 ),
                 mainPanel(
                     width = 9,
