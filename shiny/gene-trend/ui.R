@@ -64,8 +64,13 @@ shinyUI(fluidPage(
         ),
         conditionalPanel(
             condition = 'input.tabset_main == "Search"',
-            textInput('gene_name', label = 'Gene name',
-                      placeholder = 'Your awesome gene')
+            fluidRow(
+                column(width = 9,
+                       textInput('gene_name', label = 'Gene name',
+                                 placeholder = 'Your awesome gene')),
+                column(width = 3,
+                       actionButton('random_gene', label = tags$img(src = 'dice.png')))
+            )
         )
     ),
 

@@ -11,6 +11,7 @@ library(shiny)
 library(shinyjs)
 library(DT)
 library(tidyverse)
+library(lubridate)
 # library(magrittr)
 library(plotly)
 load('data/human-mouse.Rdata')
@@ -40,6 +41,21 @@ shinyServer(function(input, output, session) {
         input$gene_name
     }) %>% debounce(1500)
 
+    get_dat <- reactive({
+        if (get_input_value()$species == "human") {
+            gene_info = human_gene_info
+            gene2pdat = human_gene2pdat
+        } else if (get_input_value()$species == 'mouse') {
+            gene_info = mouse_gene_info
+            gene2pdat = mouse_gene2pdat
+        } else {
+            gene_info = data_frame()
+            gene2pdat = data_frame()
+        }
+        return(list(gene_info = gene_info,
+                    gene2pdat = gene2pdat))
+    })
+
     observeEvent(input$previous, {
         if (input$date[1] > 1991 && input$date[2] > 1991) {
             updateSliderInput(session, inputId = 'date',
@@ -56,16 +72,8 @@ shinyServer(function(input, output, session) {
 
     output$top_gene <- DT::renderDataTable({
 
-        if (get_input_value()$species == "human") {
-            gene_info = human_gene_info
-            gene2pdat = human_gene2pdat
-        } else if (get_input_value()$species == 'mouse') {
-            gene_info = mouse_gene_info
-            gene2pdat = mouse_gene2pdat
-        } else {
-            gene_info = data_frame()
-            gene2pdat = data_frame()
-        }
+        gene_info = get_dat()$gene_info
+        gene2pdat = get_dat()$gene2pdat
 
         if (input$useall) {
             gene2pdat %>%
@@ -147,25 +155,29 @@ shinyServer(function(input, output, session) {
 
     output$gene_plot <- renderPlotly({
         gene_name = get_input_gene()
-        if (get_input_value()$species == "human") {
-            gene_info = human_gene_info
-            gene2pdat = human_gene2pdat
-        } else if (get_input_value()$species == 'mouse') {
-            gene_info = mouse_gene_info
-            gene2pdat = mouse_gene2pdat
-        } else {
-            gene_info = data_frame()
-            gene2pdat = data_frame()
-        }
+        gene_info = get_dat()$gene_info
+        gene2pdat = get_dat()$gene2pdat
 
         if (gene_name %in% gene_info$Symbol) {
             gene_id = gene_info$GeneID[match(gene_name, gene_info$Symbol)]
             ggplotly(gene2pdat %>%
                 filter(GeneID == gene_id) %>%
-                ggplot(aes(x = year, y = count)) +
-                    geom_point())
+                select(-GeneID) %>%
+                    complete(year = full_seq(year, 1)) %>%
+                    replace_na(list(count = 0)) %>%
+                    ggplot(aes(x = year, y = count)) +
+                    geom_point() +
+                    ylab('Number of articles') +
+                    ylim(0, NA) +
+                    theme_bw())
         } else {
             return(list())
         }
+    })
+
+    observeEvent(input$random_gene, {
+        gene_info = get_dat()$gene_info
+        gene2pdat = get_dat()$gene2pdat
+        updateTextInput(session, 'gene_name', value = sample(gene_info$Symbol, 1))
     })
 })
