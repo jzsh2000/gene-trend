@@ -12,6 +12,7 @@ library(shinyjs)
 library(DT)
 library(tidyverse)
 # library(magrittr)
+library(plotly)
 load('data/human-mouse.Rdata')
 
 # Define server logic required to draw a histogram
@@ -34,6 +35,10 @@ shinyServer(function(input, output, session) {
              date = input$date,
              gene_num = input$gene_num)
     }) %>% debounce(800)
+
+    get_input_gene <- reactive({
+        input$gene_name
+    }) %>% debounce(1500)
 
     observeEvent(input$previous, {
         if (input$date[1] > 1991 && input$date[2] > 1991) {
@@ -139,4 +144,28 @@ shinyServer(function(input, output, session) {
         ),
         columnDefs = list(list(visible = FALSE, targets = c(3, 5)))
     ))
+
+    output$gene_plot <- renderPlotly({
+        gene_name = get_input_gene()
+        if (get_input_value()$species == "human") {
+            gene_info = human_gene_info
+            gene2pdat = human_gene2pdat
+        } else if (get_input_value()$species == 'mouse') {
+            gene_info = mouse_gene_info
+            gene2pdat = mouse_gene2pdat
+        } else {
+            gene_info = data_frame()
+            gene2pdat = data_frame()
+        }
+
+        if (gene_name %in% gene_info$Symbol) {
+            gene_id = gene_info$GeneID[match(gene_name, gene_info$Symbol)]
+            ggplotly(gene2pdat %>%
+                filter(GeneID == gene_id) %>%
+                ggplot(aes(x = year, y = count)) +
+                    geom_point())
+        } else {
+            return(list())
+        }
+    })
 })

@@ -9,6 +9,7 @@
 
 library(shiny)
 library(DT)
+library(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -27,42 +28,53 @@ shinyUI(fluidPage(
                         'Mus musculus' = 'mouse'),
             selected = 'human'
         ),
-        sliderInput(
-            inputId = 'date',
-            label = 'Date range',
-            min = 1991,
-            max = 2016,
-            value = c(2016,2016)
-        ),
-        fluidRow(
-            column(width = 4, actionButton('previous', label = '<--')),
-            column(
-                width = 4,
-                actionButton('nextyear', label = '-->',
-                             style = "float:right"),
-                offset = 4
+        conditionalPanel(
+            condition = 'input.tabset_main == "Total"',
+            sliderInput(
+                inputId = 'date',
+                label = 'Date range',
+                min = 1991,
+                max = 2016,
+                value = c(2016,2016)
+            ),
+            fluidRow(
+                column(width = 4, actionButton('previous', label = '<--')),
+                column(
+                    width = 4,
+                    actionButton('nextyear', label = '-->',
+                                 style = "float:right"),
+                    offset = 4
+                )
+            ),
+            checkboxInput('useall', 'Use all', value = FALSE),
+            tags$hr(),
+            sliderInput(
+                inputId = 'gene_num',
+                label = 'Number of genes',
+                min = 5,
+                max = 100,
+                step = 5,
+                value = 10
             )
+            # actionButton(
+            #     inputId = 'update',
+            #     label = "Let's go!",
+            #     class = 'btn-primary pull-right'
+            # )
         ),
-        checkboxInput('useall', 'Use all', value = FALSE),
-        tags$hr(),
-        sliderInput(
-            inputId = 'gene_num',
-            label = 'Number of genes',
-            min = 5,
-            max = 100,
-            step = 5,
-            value = 10
+        conditionalPanel(
+            condition = 'input.tabset_main == "Search"',
+            textInput('gene_name', label = 'Gene name',
+                      placeholder = 'Your awesome gene')
         )
-        # actionButton(
-        #     inputId = 'update',
-        #     label = "Let's go!",
-        #     class = 'btn-primary pull-right'
-        # )
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
-        dataTableOutput('top_gene')
+        tabsetPanel(id = 'tabset_main',
+                    tabPanel('Total', dataTableOutput('top_gene')),
+                    tabPanel('Search', plotlyOutput('gene_plot')))
+
     )
   )
 ))
