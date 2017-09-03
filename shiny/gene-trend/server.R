@@ -45,6 +45,7 @@ shinyServer(function(input, output, session) {
         if (get_input_value()$species == "human") {
             gene_info = human_gene_info
             gene2pdat = human_gene2pdat
+
         } else if (get_input_value()$species == 'mouse') {
             gene_info = mouse_gene_info
             gene2pdat = mouse_gene2pdat
@@ -52,8 +53,18 @@ shinyServer(function(input, output, session) {
             gene_info = data_frame()
             gene2pdat = data_frame()
         }
+        candidate_gene = gene2pdat %>%
+            group_by(GeneID) %>%
+            summarise(count = sum(count)) %>%
+            arrange(desc(count)) %>%
+            head(100) %>%
+            select(GeneID) %>%
+            left_join(gene_info, by = 'GeneID') %>%
+            pull(Symbol)
+
         return(list(gene_info = gene_info,
-                    gene2pdat = gene2pdat))
+                    gene2pdat = gene2pdat,
+                    candidate_gene = candidate_gene))
     })
 
     observeEvent(input$previous, {
@@ -176,8 +187,7 @@ shinyServer(function(input, output, session) {
     })
 
     observeEvent(input$random_gene, {
-        gene_info = get_dat()$gene_info
-        gene2pdat = get_dat()$gene2pdat
-        updateTextInput(session, 'gene_name', value = sample(gene_info$Symbol, 1))
+        updateTextInput(session, 'gene_name',
+                        value = sample(get_dat()$candidate_gene, 1))
     })
 })
