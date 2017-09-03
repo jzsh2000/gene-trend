@@ -171,16 +171,34 @@ shinyServer(function(input, output, session) {
 
         if (gene_name %in% gene_info$Symbol) {
             gene_id = gene_info$GeneID[match(gene_name, gene_info$Symbol)]
-            ggplotly(gene2pdat %>%
+            gene_dat = gene2pdat %>%
+                group_by(year) %>%
+                mutate(rank = min_rank(desc(count))) %>%
+                ungroup() %>%
                 filter(GeneID == gene_id) %>%
                 select(-GeneID) %>%
-                    complete(year = full_seq(year, 1)) %>%
-                    replace_na(list(count = 0)) %>%
-                    ggplot(aes(x = year, y = count)) +
-                    geom_point() +
-                    ylab('Number of articles') +
-                    ylim(0, NA) +
-                    theme_bw())
+                complete(year = full_seq(year, 1)) %>%
+                replace_na(list(count = 0, rank = 99999)) %>%
+                mutate(rank_group = map_chr(rank, function(x) {
+                    if (x <= 1) return('top1')
+                    else if (x <= 10) return('top10')
+                    else if (x <= 100) return('top100')
+                    else if (x <= 1000) return('top1000')
+                    else return('*')
+                })) %>%
+                mutate(rank_group = factor(rank_group,
+                                           levels = c('top1',
+                                                      'top10',
+                                                      'top100',
+                                                      'top1000',
+                                                      '*')))
+            ggplotly(ggplot(gene_dat, aes(x = year, y = count, rank = rank)) +
+                         geom_point(aes(color = rank_group)) +
+                         ylab('Number of articles') +
+                         ylim(0, NA) +
+                         scale_colour_hue(limits = levels(gene_dat$rank_group)) +
+                         theme_bw(),
+                     tooltip = c('year', 'count', 'rank'))
         } else {
             return(list())
         }
