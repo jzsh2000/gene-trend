@@ -39,7 +39,7 @@ shinyServer(function(input, output, session) {
 
     get_input_gene <- reactive({
         input$gene_name
-    }) %>% debounce(1500)
+    }) %>% debounce(1000)
 
     get_dat <- reactive({
         if (get_input_value()$species == "human") {
@@ -170,7 +170,9 @@ shinyServer(function(input, output, session) {
         gene2pdat = get_dat()$gene2pdat
 
         if (gene_name %in% gene_info$Symbol) {
-            gene_id = gene_info$GeneID[match(gene_name, gene_info$Symbol)]
+            gene_row_idx = match(gene_name, gene_info$Symbol)
+            gene_id = gene_info$GeneID[gene_row_idx]
+            gene_description = gene_info$description[gene_row_idx]
             gene_dat = gene2pdat %>%
                 group_by(year) %>%
                 mutate(rank = min_rank(desc(count))) %>%
@@ -197,6 +199,8 @@ shinyServer(function(input, output, session) {
                          ylab('Number of articles') +
                          ylim(0, NA) +
                          scale_colour_hue(limits = levels(gene_dat$rank_group)) +
+                         ggtitle(paste0(gene_name,
+                                        ' (',gene_description, ')')) +
                          theme_bw(),
                      tooltip = c('year', 'count', 'rank'))
         } else {
