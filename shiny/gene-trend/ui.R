@@ -66,8 +66,8 @@ shinyUI(fluidPage(
             condition = 'input.tabset_main == "Search"',
             fluidRow(
                 column(width = 9,
-                       textInput('gene_name', label = 'Gene name',
-                                 placeholder = 'Your awesome gene')),
+                       selectizeInput('gene_name', label = 'Gene name',
+                                      choices = 'hello, world')),
                 column(width = 3,
                        actionButton('random_gene', label = tags$img(src = 'dice.png')))
             )
