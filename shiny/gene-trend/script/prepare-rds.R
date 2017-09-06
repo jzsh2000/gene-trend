@@ -40,3 +40,15 @@ save(human_gene2pdat,
      mouse_gene_info,
      mouse_gene_name,
      file = 'shiny/gene-trend/data/human-mouse.Rdata')
+
+# prepare MeSH names
+human_mesh_id = read_tsv("data/current/gene-mesh/9606/gene-mesh.major.txt",
+                         col_types = 'ccc',
+                         col_names = c('gene_id', 'mesh_id', 'n')) %>%
+    select(mesh_id) %>%
+    unique()
+mouse_mesh_id = read_tsv("data/current/gene-mesh/10090/gene-mesh.major.txt",
+                         col_types = 'ccc',
+                         col_names = c('gene_id', 'mesh_id', 'n')) %>%
+    select(mesh_id) %>%
+    unique()
