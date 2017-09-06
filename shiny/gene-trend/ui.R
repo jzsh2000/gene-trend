@@ -10,6 +10,12 @@
 library(shiny)
 library(DT)
 library(plotly)
+library(tidyverse)
+
+mesh_choices <- read_rds('data/mesh_dat.rds') %>%
+    select(mesh_term, mesh_id) %>%
+    unique() %>%
+    deframe()
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -46,7 +52,12 @@ shinyUI(fluidPage(
                     offset = 4
                 )
             ),
-            checkboxInput('useall', 'Use all', value = FALSE),
+            checkboxInput('useall_date', 'Use all', value = TRUE),
+
+            tags$hr(),
+            selectizeInput('mesh', label = 'MeSH term', choices = mesh_choices),
+            checkboxInput('useall_mesh', 'Use all', value = TRUE),
+
             tags$hr(),
             sliderInput(
                 inputId = 'gene_num',

@@ -19,8 +19,8 @@ load('data/human-mouse.Rdata')
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 
-    observeEvent(input$useall, {
-        if (input$useall == FALSE) {
+    observeEvent(input$useall_date, {
+        if (input$useall_date == FALSE) {
             enable('date')
             enable('previous')
             enable('nextyear')
@@ -28,6 +28,14 @@ shinyServer(function(input, output, session) {
             disable('date')
             disable('previous')
             disable('nextyear')
+        }
+    })
+
+    observeEvent(input$useall_mesh,  {
+        if (input$useall_mesh == FALSE) {
+            enable('mesh')
+        } else {
+            disable('mesh')
         }
     })
 
@@ -90,7 +98,7 @@ shinyServer(function(input, output, session) {
         gene_info = get_dat()$gene_info
         gene2pdat = get_dat()$gene2pdat
 
-        if (input$useall) {
+        if (input$useall_date) {
             gene2pdat %>%
                 group_by(GeneID) %>%
                 summarise(count = sum(count)) %>%
@@ -163,7 +171,7 @@ shinyServer(function(input, output, session) {
                        ),
                        list(extend = 'colvis',
                             columns = c(1,3:6))
-                            # columns = c(1,3:ifelse(input$useall, 5, 6)))
+                            # columns = c(1,3:ifelse(input$useall_date, 5, 6)))
         ),
         columnDefs = list(list(visible = FALSE, targets = c(3, 5)))
     ))

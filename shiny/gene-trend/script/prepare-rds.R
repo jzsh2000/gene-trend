@@ -33,15 +33,9 @@ mouse_gene_name <- mouse_gene2pdat %>%
     sort() %>%
     str_subset('^[A-Z][-A-z0-9]+')
 
-save(human_gene2pdat,
-     human_gene_info,
-     human_gene_name,
-     mouse_gene2pdat,
-     mouse_gene_info,
-     mouse_gene_name,
-     file = 'shiny/gene-trend/data/human-mouse.Rdata')
-
 # prepare MeSH names
+mesh_tree <- read_tsv("data/mesh/2017MeshTree.txt",
+                      col_types = 'ccc')
 human_mesh_id = read_tsv("data/current/gene-mesh/9606/gene-mesh.major.txt",
                          col_types = 'ccc',
                          col_names = c('gene_id', 'mesh_id', 'n')) %>%
@@ -52,3 +46,20 @@ mouse_mesh_id = read_tsv("data/current/gene-mesh/10090/gene-mesh.major.txt",
                          col_names = c('gene_id', 'mesh_id', 'n')) %>%
     select(mesh_id) %>%
     unique()
+
+mesh_dat = bind_rows(human_mesh_id, mouse_mesh_id) %>%
+    unique() %>%
+    left_join(mesh_tree, by = c('mesh_id' = 'Desc Ui')) %>%
+    rename(tree_number = `Tree Number`, mesh_term = Term) %>%
+    select(mesh_id, mesh_term, tree_number)
+
+# save RData to file
+save(human_gene2pdat,
+     human_gene_info,
+     human_gene_name,
+     mouse_gene2pdat,
+     mouse_gene_info,
+     mouse_gene_name,
+     file = 'shiny/gene-trend/data/human-mouse.Rdata')
+
+write_rds(mesh_dat, 'shiny/gene-trend/data/mesh_dat.rds')
