@@ -55,8 +55,9 @@ shinyUI(fluidPage(
             checkboxInput('useall_date', 'Use all', value = TRUE),
 
             tags$hr(),
-            selectizeInput('mesh', label = 'MeSH term', choices = mesh_choices),
-            checkboxInput('useall_mesh', 'Use all', value = TRUE),
+            selectizeInput('mesh', label = 'MeSH term',
+                           choices = mesh_choices, selected = 'D003713'),
+            checkboxInput('useall_mesh', 'Use all', value = FALSE),
 
             tags$hr(),
             sliderInput(

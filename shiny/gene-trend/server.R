@@ -42,6 +42,7 @@ shinyServer(function(input, output, session) {
     get_input_value <- reactive({
         list(species = input$species,
              date = input$date,
+             mesh = input$mesh,
              gene_num = input$gene_num)
     }) %>% debounce(800)
 
@@ -54,14 +55,17 @@ shinyServer(function(input, output, session) {
             gene_info = human_gene_info
             gene2pdat = human_gene2pdat
             gene_name = human_gene_name
+            gene_mesh = human_gene_mesh
         } else if (get_input_value()$species == 'mouse') {
             gene_info = mouse_gene_info
             gene2pdat = mouse_gene2pdat
             gene_name = mouse_gene_name
+            gene_mesh = mouse_gene_mesh
         } else {
             gene_info = data_frame()
             gene2pdat = data_frame()
             gene_name = c('')
+            gene_mesh = data_frame()
         }
         candidate_gene = gene2pdat %>%
             group_by(GeneID) %>%
@@ -76,6 +80,7 @@ shinyServer(function(input, output, session) {
         return(list(gene_info = gene_info,
                     gene2pdat = gene2pdat,
                     gene_name = gene_name,
+                    gene_mesh = gene_mesh,
                     candidate_gene = candidate_gene))
     })
 
@@ -96,7 +101,17 @@ shinyServer(function(input, output, session) {
     output$top_gene <- DT::renderDataTable({
 
         gene_info = get_dat()$gene_info
-        gene2pdat = get_dat()$gene2pdat
+        mesh_term = get_input_value()$mesh
+        # gene2pdat = get_dat()$gene2pdat
+        # gene_mesh = get_dat()$gene_mesh
+
+        if (input$useall_mesh || is.null(mesh_term)) {
+            gene2pdat = get_dat()$gene2pdat
+        } else {
+            gene2pdat = get_dat()$gene_mesh %>%
+                filter(mesh_id == mesh_term) %>%
+                select(-mesh_id)
+        }
 
         if (input$useall_date) {
             gene2pdat %>%
@@ -107,7 +122,7 @@ shinyServer(function(input, output, session) {
                 filter(rank <= get_input_value()$gene_num) %>%
                 left_join(gene_info, by = 'GeneID') %>%
                 select(GeneID, Symbol, Synonyms, description, count) %>%
-                rename(Description = description, Articles = count) %>%
+                dplyr::rename(Description = description, Articles = count) %>%
                 mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
                                        GeneID, '" target=_blank>',
                                        Symbol,'</a>'),
@@ -141,7 +156,7 @@ shinyServer(function(input, output, session) {
                 replace_na(list(rank_prev = max(.$rank_prev, na.rm = TRUE) + 1)) %>%
                 mutate(rank_diff = rank_prev - rank) %>%
                 select(GeneID, Symbol, Synonyms, description, count, rank_diff) %>%
-                rename(Description = description, Articles = count) %>%
+                dplyr::rename(Description = description, Articles = count) %>%
                 mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
                                        GeneID, '" target=_blank>',
                                        Symbol,'</a>')) %>%

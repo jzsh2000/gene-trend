@@ -75,6 +75,7 @@ do
     echo "Species: $species"
     mkdir -p $outdir/$species
     if [ ! -f $outdir/$species/gene-mesh.txt ]; then
+        echo $outdir/$species/gene-mesh.txt
         cat $outdir/pubmed-gene-mesh.txt \
             | awk -v s=$species '$2==s{print $3,$4}' \
             | sort \
@@ -84,6 +85,7 @@ do
     fi
 
     if [ ! -f $outdir/$species/gene-mesh.major.txt ]; then
+        echo $outdir/$species/gene-mesh.major.txt
         cat $outdir/pubmed-gene-mesh.txt \
             | awk -v s=$species '$2==s && $5=="Y"{print $3,$4}' \
             | sort \
@@ -92,7 +94,25 @@ do
             > $outdir/$species/gene-mesh.major.txt
     fi
 
+    if [ ! -f $outdir/$species/gene-mesh-pdat.major.txt ]; then
+        echo $outdir/$species/gene-mesh-pdat.major.txt
+        cat $outdir/pubmed-gene-mesh.txt \
+            | awk -v s=$species 'BEGIN{OFS="\t"} $2==s && $5=="Y"{print $1,$3,$4}' \
+            | sort -k1b,1 \
+            | join -t $'\t' - data/pubmed/data/pubmed/clean_data/pubmed-pdat.txt \
+            | awk -F'\t' 'BEGIN{OFS="\t"}
+                {
+                    split($4,d,"-");
+                    printf "%s\t%s\t%s\n",$2,$3,d[1]
+                }' \
+            | sort \
+            | uniq -c \
+            | awk 'BEGIN{OFS="\t"}{print $2,$3,$4,$1}' \
+            > $outdir/$species/gene-mesh-pdat.major.txt
+    fi
+
     if [ ! -f $outdir/$species/gene-mesh-disease.txt ]; then
+        echo $outdir/$species/gene-mesh-disease.txt
         cat $outdir/$species/gene-mesh.txt \
             | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
             | sort -k1b,1 \
@@ -102,6 +122,7 @@ do
     fi
 
     if [ ! -f $outdir/$species/gene-mesh-disease.major.txt ]; then
+        echo $outdir/$species/gene-mesh-disease.major.txt
         cat $outdir/$species/gene-mesh.major.txt \
             | awk -F'\t' 'BEGIN{OFS="\t"}{print $2,$1,$3}' \
             | sort -k1b,1 \

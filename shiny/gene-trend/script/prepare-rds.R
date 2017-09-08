@@ -53,13 +53,22 @@ mesh_dat = bind_rows(human_mesh_id, mouse_mesh_id) %>%
     rename(tree_number = `Tree Number`, mesh_term = Term) %>%
     select(mesh_id, mesh_term, tree_number)
 
+human_gene_mesh <- read_tsv("data/current/gene-mesh/9606/gene-mesh-pdat.major.txt",
+                            col_types = 'icii',
+                            col_names = c('GeneID', 'mesh_id', 'year', 'count'))
+mouse_gene_mesh <- read_tsv("data/current/gene-mesh/10090/gene-mesh-pdat.major.txt",
+                            col_types = 'icii',
+                            col_names = c('GeneID', 'mesh_id', 'year', 'count'))
+
 # save RData to file
 save(human_gene2pdat,
      human_gene_info,
      human_gene_name,
+     human_gene_mesh,
      mouse_gene2pdat,
      mouse_gene_info,
      mouse_gene_name,
+     mouse_gene_mesh,
      file = 'shiny/gene-trend/data/human-mouse.Rdata')
 
 write_rds(mesh_dat, 'shiny/gene-trend/data/mesh_dat.rds')
