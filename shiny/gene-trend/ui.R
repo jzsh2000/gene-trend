@@ -90,7 +90,7 @@ shinyUI(fluidPage(
     mainPanel(
         tabsetPanel(id = 'tabset_main',
                     tabPanel('Total',
-                             textOutput('mesh_tree'),
+                             uiOutput('mesh_tree'),
                              dataTableOutput('top_gene')),
                     tabPanel('Search', plotlyOutput('gene_plot')))
 

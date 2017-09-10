@@ -244,10 +244,25 @@ shinyServer(function(input, output, session) {
                              selected = sample(get_dat()$candidate_gene, 1))
     })
 
-    output$mesh_tree <- renderText({
-        mesh_term = get_input_value()$mesh
+    output$mesh_tree <- renderUI({
+        mesh_ = get_input_value()$mesh
         mesh_tree_id = mesh_dat %>%
-            filter(mesh_id == mesh_term) %>%
+            filter(mesh_id == mesh_) %>%
             pull(tree_number)
+        # print(mesh_tree_id)
+        output = map_chr(mesh_tree_id, function(id) {
+            id_split = str_split(id, '\\.')[[1]]
+            paste(map_chr(seq_along(id_split), function(n) {
+                id_part = paste(id_split[1:n], collapse = '.')
+                # print(id_part)
+                mesh_dat %>%
+                    filter(tree_number == id_part) %>%
+                    pull(mesh_term) %>%
+                    head(1)
+            }), collapse = ' > ')
+        })
+
+        tagList(tags$ul(lapply(output, function(x) {tags$li(x)})),
+                tags$hr())
     })
 })
