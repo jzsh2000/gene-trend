@@ -11,11 +11,12 @@ library(shiny)
 library(shinyjs)
 library(DT)
 library(tidyverse)
+library(stringr)
 library(lubridate)
 # library(magrittr)
 library(plotly)
 load('data/human-mouse.Rdata')
-
+mesh_dat <- read_rds('data/mesh_dat.rds')
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
 
@@ -34,8 +35,10 @@ shinyServer(function(input, output, session) {
     observeEvent(input$useall_mesh,  {
         if (input$useall_mesh == FALSE) {
             enable('mesh')
+            show('mesh_tree')
         } else {
             disable('mesh')
+            mesh('mesh_tree')
         }
     })
 
@@ -239,5 +242,12 @@ shinyServer(function(input, output, session) {
         updateSelectizeInput(session,
                              'gene_name',
                              selected = sample(get_dat()$candidate_gene, 1))
+    })
+
+    output$mesh_tree <- renderText({
+        mesh_term = get_input_value()$mesh
+        mesh_tree_id = mesh_dat %>%
+            filter(mesh_id == mesh_term) %>%
+            pull(tree_number)
     })
 })

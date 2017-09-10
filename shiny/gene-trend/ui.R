@@ -89,7 +89,9 @@ shinyUI(fluidPage(
     # Show a plot of the generated distribution
     mainPanel(
         tabsetPanel(id = 'tabset_main',
-                    tabPanel('Total', dataTableOutput('top_gene')),
+                    tabPanel('Total',
+                             textOutput('mesh_tree'),
+                             dataTableOutput('top_gene')),
                     tabPanel('Search', plotlyOutput('gene_plot')))
 
     )
