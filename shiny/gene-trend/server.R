@@ -113,7 +113,10 @@ shinyServer(function(input, output, session) {
         } else {
             gene2pdat = get_dat()$gene_mesh %>%
                 filter(mesh_id == mesh_term) %>%
-                select(-mesh_id)
+                select(-mesh_id) %>%
+                group_by(GeneID, year) %>%
+                summarise(count = n()) %>%
+                ungroup()
         }
 
         if (input$useall_date) {
