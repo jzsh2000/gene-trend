@@ -47,12 +47,12 @@ mouse_mesh_id = read_tsv("data/current/gene-mesh/10090/gene-mesh.major.txt",
     select(mesh_id) %>%
     unique()
 
-human_gene_mesh <- read_tsv("data/current/gene-mesh/9606/gene-mesh-pdat.major.txt",
+human_gene_mesh <- read_tsv("data/current/gene-mesh/9606/gene-mesh-pubmed-pdat.major.txt",
                             col_types = 'icii',
-                            col_names = c('GeneID', 'mesh_id', 'year', 'count'))
-mouse_gene_mesh <- read_tsv("data/current/gene-mesh/10090/gene-mesh-pdat.major.txt",
+                            col_names = c('GeneID', 'mesh_id', 'year', 'pubmed_id'))
+mouse_gene_mesh <- read_tsv("data/current/gene-mesh/10090/gene-mesh-pubmed-pdat.major.txt",
                             col_types = 'icii',
-                            col_names = c('GeneID', 'mesh_id', 'year', 'count'))
+                            col_names = c('GeneID', 'mesh_id', 'year', 'pubmed_id'))
 
 # save RData to file
 save(human_gene2pdat,

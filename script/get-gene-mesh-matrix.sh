@@ -111,6 +111,21 @@ do
             > $outdir/$species/gene-mesh-pdat.major.txt
     fi
 
+    if [ ! -f $outdir/$species/gene-mesh-pubmed-pdat.major.txt ]; then
+        echo $outdir/$species/gene-mesh-pubmed-pdat.major.txt
+        cat $outdir/pubmed-gene-mesh.txt \
+            | awk -v s=$species 'BEGIN{OFS="\t"} $2==s && $5=="Y"{print $1,$3,$4}' \
+            | sort -k1b,1 \
+            | join -t $'\t' - data/pubmed/data/pubmed/clean_data/pubmed-pdat.txt \
+            | awk -F'\t' 'BEGIN{OFS="\t"}
+                {
+                    split($4,d,"-");
+                    printf "%s\t%s\t%s\t%s\n",$2,$3,d[1],$1
+                }' \
+            | sort -k1n -k2 -k3n \
+            > $outdir/$species/gene-mesh-pubmed-pdat.major.txt
+    fi
+
     if [ ! -f $outdir/$species/gene-mesh-disease.txt ]; then
         echo $outdir/$species/gene-mesh-disease.txt
         cat $outdir/$species/gene-mesh.txt \
