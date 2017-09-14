@@ -35,9 +35,11 @@ shinyServer(function(input, output, session) {
     observeEvent(input$useall_mesh,  {
         if (input$useall_mesh == FALSE) {
             enable('mesh')
+            enable('child_mesh')
             show('mesh_tree')
         } else {
             disable('mesh')
+            disable('child_mesh')
             mesh('mesh_tree')
         }
     })
@@ -104,19 +106,42 @@ shinyServer(function(input, output, session) {
     output$top_gene <- DT::renderDataTable({
 
         gene_info = get_dat()$gene_info
-        mesh_term = get_input_value()$mesh
+        mesh_ = get_input_value()$mesh
         # gene2pdat = get_dat()$gene2pdat
         # gene_mesh = get_dat()$gene_mesh
 
-        if (input$useall_mesh || is.null(mesh_term)) {
+        if (input$useall_mesh || is.null(mesh_)) {
             gene2pdat = get_dat()$gene2pdat
         } else {
-            gene2pdat = get_dat()$gene_mesh %>%
-                filter(mesh_id == mesh_term) %>%
-                select(-mesh_id) %>%
-                group_by(GeneID, year) %>%
-                summarise(count = n()) %>%
-                ungroup()
+            if (input$child_mesh) {
+                mesh_ids = mesh_dat %>%
+                    filter(mesh_id == mesh_) %>%
+                    pull(tree_number) %>%
+                    unique()
+                # print(mesh_ids)
+                mesh_ids_extended = Reduce(union, lapply(mesh_ids, function(id) {
+                    str_subset(mesh_dat$tree_number, fixed(id))
+                }))
+                # print(mesh_ids_extended)
+                mesh_ids_extended = mesh_dat %>%
+                    filter(tree_number %in% mesh_ids_extended) %>%
+                    pull(mesh_id) %>%
+                    unique()
+                # print(mesh_ids_extended)
+                gene2pdat = get_dat()$gene_mesh %>%
+                    filter(mesh_id %in% mesh_ids_extended) %>%
+                    select(-mesh_id) %>%
+                    group_by(GeneID, year) %>%
+                    summarise(count = n_distinct(pubmed_id)) %>%
+                    ungroup()
+            } else {
+                gene2pdat = get_dat()$gene_mesh %>%
+                    filter(mesh_id == mesh_) %>%
+                    select(-mesh_id) %>%
+                    group_by(GeneID, year) %>%
+                    summarise(count = n_distinct(pubmed_id)) %>%
+                    ungroup()
+            }
         }
 
         if (input$useall_date) {

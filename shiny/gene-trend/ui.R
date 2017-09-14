@@ -58,6 +58,7 @@ shinyUI(fluidPage(
             selectizeInput('mesh', label = 'MeSH term',
                            choices = mesh_choices, selected = 'D003713'),
             checkboxInput('useall_mesh', 'Use all', value = FALSE),
+            checkboxInput('child_mesh', 'Add child nodes', value = TRUE),
 
             tags$hr(),
             sliderInput(
