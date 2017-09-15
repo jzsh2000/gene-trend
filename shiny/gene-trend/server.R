@@ -40,7 +40,7 @@ shinyServer(function(input, output, session) {
         } else {
             disable('mesh')
             disable('child_mesh')
-            mesh('mesh_tree')
+            hide('mesh_tree')
         }
     })
 
@@ -159,18 +159,13 @@ shinyServer(function(input, output, session) {
             if (input$useall_mesh) {
                 base_url_gene = 'https://www.ncbi.nlm.nih.gov/gene'
                 base_url_pubmed = 'https://www.ncbi.nlm.nih.gov/pubmed'
-                out_dat %>%
-                    mutate(Symbol = paste0('<a href="', base_url, '/',
-                                           GeneID, '" target=_blank>',
-                                           Symbol,'</a>'),
-                           Articles = paste0('<a href="', base_url_pubmed,
+                out_dat = out_dat %>%
+                    mutate(Articles = paste0('<a href="', base_url_pubmed,
                                              '?LinkName=gene_pubmed&from_uid=',
                                              GeneID,
                                              '" target=_blank>',
                                              Articles, '</a>'))
             }
-            out_dat
-
         } else {
             year_bot = get_input_value()$date[1]
             year_top = get_input_value()$date[2]
@@ -193,7 +188,7 @@ shinyServer(function(input, output, session) {
                 filter(GeneID %in% dat_now$GeneID) %>%
                 select(GeneID, rank_prev)
 
-            dat_now %>%
+            out_dat = dat_now %>%
                 left_join(gene_info, by = 'GeneID') %>%
                 left_join(dat_prev, by = 'GeneID') %>%
                 replace_na(list(rank_prev = max(.$rank_prev, na.rm = TRUE) + 1)) %>%
@@ -214,6 +209,11 @@ shinyServer(function(input, output, session) {
                 })) %>%
                 select(-rank_diff)
         }
+        base_url_gene = 'https://www.ncbi.nlm.nih.gov/gene'
+        out_dat = out_dat %>%
+            mutate(Symbol = paste0('<a href="', base_url_gene, '/',
+                                   GeneID, '" target=_blank>',
+                                   Symbol,'</a>'))
     },
     escape = FALSE,
     selection = 'single',
