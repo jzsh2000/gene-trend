@@ -145,7 +145,7 @@ shinyServer(function(input, output, session) {
         }
 
         if (input$useall_date) {
-            gene2pdat %>%
+            out_dat = gene2pdat %>%
                 group_by(GeneID) %>%
                 summarise(count = sum(count)) %>%
                 mutate(rank = min_rank(desc(count))) %>%
@@ -154,11 +154,23 @@ shinyServer(function(input, output, session) {
                 left_join(gene_info, by = 'GeneID') %>%
                 select(GeneID, Symbol, Synonyms, description, count) %>%
                 dplyr::rename(Description = description, Articles = count) %>%
-                mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
-                                       GeneID, '" target=_blank>',
-                                       Symbol,'</a>'),
-                       Articles = paste0('<a href="https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=', GeneID, '" target=_blank>', Articles, '</a>')) %>%
                 mutate(`Ranking change` = '-')
+
+            if (input$useall_mesh) {
+                base_url_gene = 'https://www.ncbi.nlm.nih.gov/gene'
+                base_url_pubmed = 'https://www.ncbi.nlm.nih.gov/pubmed'
+                out_dat %>%
+                    mutate(Symbol = paste0('<a href="', base_url, '/',
+                                           GeneID, '" target=_blank>',
+                                           Symbol,'</a>'),
+                           Articles = paste0('<a href="', base_url_pubmed,
+                                             '?LinkName=gene_pubmed&from_uid=',
+                                             GeneID,
+                                             '" target=_blank>',
+                                             Articles, '</a>'))
+            }
+            out_dat
+
         } else {
             year_bot = get_input_value()$date[1]
             year_top = get_input_value()$date[2]
