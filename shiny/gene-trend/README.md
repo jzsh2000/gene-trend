@@ -2,9 +2,10 @@ About
 =====
 This shiny application has two functionalities:
 
-1. Show the most studies human and mouse genes each year (or in a date range).
-2. Show the most studies human and mouse genes for a specified MeSH term.
-3. Show the research trend of one specified gene (e.g. TP53)
+1. Show the most studies human and mouse genes (can be filtered by a date range
+   or a specified [MeSH](https://www.ncbi.nlm.nih.gov/mesh) term).
+2. Show the research trend of one specified gene (e.g.
+   [TP53](https://www.ncbi.nlm.nih.gov/gene/7157))
 
 Top human genes of 2016:
 1. [TP53](https://www.ncbi.nlm.nih.gov/gene/7157) (tumor protein p53)
