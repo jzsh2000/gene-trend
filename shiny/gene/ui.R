@@ -42,6 +42,12 @@ shinyUI(fluidPage(
                                     'PubMed articles (immunology)' = 'pubmed_immuno',
                                     'PubMed articles (tumour)' = 'pubmed_tumor')
                     ),
+                    selectizeInput(
+                        inputId = 'filterby',
+                        label = "Filter by",
+                        choices = c('None' = 'na',
+                                    'Surface Marker' = 'surface')
+                    ),
                     hr(),
                     fileInput(
                         inputId = 'gene_list_file',

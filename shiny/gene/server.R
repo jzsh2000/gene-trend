@@ -15,6 +15,7 @@ library(stringr)
 library(htmltools)
 
 homologene <- read_rds('robj/human-mouse-homologene.rds')
+surface_marker <- read_rds('gene-list/surface-marker.rds')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -25,6 +26,14 @@ shinyServer(function(input, output, session) {
         req(input$gene_list_file)
         rv$data <- paste(readLines(input$gene_list_file$datapath),
                          collapse = '\n')
+    })
+
+    observeEvent(input$species, {
+        if (input$species == 'human') {
+            enable('filterby')
+        } else {
+            disable('filterby')
+        }
     })
 
     get_gene_list <- reactive({
@@ -120,10 +129,16 @@ shinyServer(function(input, output, session) {
             mutate(type = 'ensembl id')
         res.unmatched = setdiff(res.unmatched, res_part.ensembl$name)
 
-        list(matched = bind_rows(res_part.id,
-                                 res_part.symbol,
-                                 res_part.synonym,
-                                 res_part.ensembl),
+        res.matched = bind_rows(res_part.id,
+                                res_part.symbol,
+                                res_part.synonym,
+                                res_part.ensembl)
+
+        if (input$filterby == 'surface') {
+            res.matched = res.matched %>%
+                semi_join(surface_marker, by = 'GeneID')
+        }
+        list(matched = res.matched,
              unmatched = res.unmatched)
     })
 
