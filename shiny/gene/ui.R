@@ -46,7 +46,8 @@ shinyUI(fluidPage(
                         inputId = 'filterby',
                         label = "Filter by",
                         choices = c('None' = 'na',
-                                    'Surface Marker' = 'surface')
+                                    'Surface Marker' = 'surface',
+                                    'CD Molecules' = 'cd')
                     ),
                     hr(),
                     fileInput(

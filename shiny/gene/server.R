@@ -16,6 +16,7 @@ library(htmltools)
 
 homologene <- read_rds('robj/human-mouse-homologene.rds')
 surface_marker <- read_rds('gene-list/surface-marker.rds')
+cd_molecules <- read_rds('gene-list/cd.rds')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -134,9 +135,14 @@ shinyServer(function(input, output, session) {
                                 res_part.synonym,
                                 res_part.ensembl)
 
-        if (input$filterby == 'surface') {
-            res.matched = res.matched %>%
-                semi_join(surface_marker, by = 'GeneID')
+        if (input$filterby != 'na') {
+            if (input$filterby == 'surface') {
+                res.matched = res.matched %>%
+                    semi_join(surface_marker, by = 'GeneID')
+            } else if (input$filterby == 'cd') {
+                res.matched = res.matched %>%
+                    semi_join(cd_molecules, by = 'GeneID')
+            }
         }
         list(matched = res.matched,
              unmatched = res.unmatched)
