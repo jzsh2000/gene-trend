@@ -438,6 +438,14 @@ shinyServer(function(input, output, session) {
                                           collapse = '\n'))
     })
 
+    observeEvent(input$list3, {
+        rv$data <- NULL
+        reset("gene_list_file")
+        updateTextAreaInput(session, 'gene',
+                            value = paste(readLines('example/3.txt'),
+                                          collapse = '\n'))
+    })
+
     # update gene summary text when a gene is selected
     observe(
         if (!is.null(input$gene_table_row_last_clicked)) {

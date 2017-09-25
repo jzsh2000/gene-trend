@@ -11,3 +11,7 @@ span.red-box {
 span.blue-box {
     border: 1px dotted blue;
 }
+
+span.green-box {
+    border: 1px dotted green;
+}

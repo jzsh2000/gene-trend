@@ -72,7 +72,11 @@ shinyUI(fluidPage(
                                br(),
                                actionLink(inputId = 'list2',
                                           label = tags$span('List 2',
-                                                            class = 'blue-box')))
+                                                            class = 'blue-box')),
+                               br(),
+                               actionLink(inputId = 'list3',
+                                          label = tags$span('List 3',
+                                                            class = 'green-box')))
                     ),
                     tableOutput('gene_list_summary')
                 ),
