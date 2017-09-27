@@ -80,6 +80,7 @@ shinyServer(function(input, output, session) {
         ensembl2id = get_species()[['ensembl2id']]
 
         if (length(gene_list) == 0) {
+            hideTab(inputId = 'output_panel', target = 'unmatched')
             return(list(
                 matched = tibble(name = character(),
                                  GeneID = integer(),
@@ -129,6 +130,12 @@ shinyServer(function(input, output, session) {
             select(name, GeneID) %>%
             mutate(type = 'ensembl id')
         res.unmatched = setdiff(res.unmatched, res_part.ensembl$name)
+        print(length(res.unmatched))
+        if (length(res.unmatched) > 0) {
+            showTab(inputId = 'output_panel', target = 'unmatched')
+        } else {
+            hideTab(inputId = 'output_panel', target = 'unmatched')
+        }
 
         res.matched = bind_rows(res_part.id,
                                 res_part.symbol,
@@ -300,52 +307,6 @@ shinyServer(function(input, output, session) {
     selection = 'single'
     )
 
-    output$output_panel <- renderUI({
-        if (length(get_unmatched()) == 0) {
-            tabsetPanel(
-                id = 'output_panel',
-                tabPanel(
-                    title = "gene table",
-                    fluidRow(
-                        column(width = 8,
-                               dataTableOutput("gene_table")),
-                        column(width = 4,
-                               uiOutput('gene_summary'),
-                               hr(),
-                               uiOutput('pmid'))
-                    )
-                ),
-                tabPanel(
-                    title = 'database',
-                    dataTableOutput("gene_info_database")
-                )
-            )
-        } else {
-            tabsetPanel(
-                id = 'output_panel',
-                tabPanel(
-                    title = "gene table",
-                    fluidRow(
-                        column(width = 8,
-                               dataTableOutput("gene_table")),
-                        column(width = 4,
-                               uiOutput('gene_summary'),
-                               hr(),
-                               uiOutput('pmid'))
-                    )
-                ),
-                tabPanel(
-                    title = "unmatched",
-                    verbatimTextOutput('unmatched')
-                ),
-                tabPanel(
-                    title = 'database',
-                    dataTableOutput("gene_info_database")
-                )
-            )
-        }
-    })
-
     output$gene_summary <- renderUI(
         tags$div(class = "panel panel-default",
                  tags$div(class = 'panel-heading', 'Gene Summary'),
@@ -498,5 +459,18 @@ shinyServer(function(input, output, session) {
                 out_df
             }
         }
-    })
+    },
+    server = FALSE,
+    extension = 'Buttons',
+    options = list(
+        lengthMenu = list(c(10, 25, 50, 100, -1),
+                          c('10', '25', '50', '100', 'ALL')),
+        dom = 'Bfrtip',
+        buttons = list('copy',
+                       list(
+                           extend = 'collection',
+                           buttons = c('csv', 'excel', 'pdf'),
+                           text = 'Download'
+                       )))
+    )
 })
