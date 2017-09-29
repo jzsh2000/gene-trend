@@ -130,7 +130,7 @@ shinyServer(function(input, output, session) {
             select(name, GeneID) %>%
             mutate(type = 'ensembl id')
         res.unmatched = setdiff(res.unmatched, res_part.ensembl$name)
-        print(length(res.unmatched))
+        # print(length(res.unmatched))
         if (length(res.unmatched) > 0) {
             showTab(inputId = 'output_panel', target = 'unmatched')
         } else {
@@ -307,27 +307,22 @@ shinyServer(function(input, output, session) {
     selection = 'single'
     )
 
-    output$gene_summary <- renderUI(
-        tags$div(class = "panel panel-default",
-                 tags$div(class = 'panel-heading', 'Gene Summary'),
-                 tags$div(class = "panel-body",
-                          ifelse(rv$summary == '',
-                                 'no gene summary',
-                                 rv$summary)
-                          )
-        )
+    output$gene_summary <- renderText(
+        ifelse(rv$summary == '',
+               'no gene summary',
+               rv$summary)
     )
 
     output$pmid <- renderUI({
         if (length(rv$pmid) == 0) {
-            tags$div(
-                class = "container",
+            tags$p(
+                # class = "container",
                 tags$span('no citations')
             )
         }
         else if (length(rv$pmid) < 100) {
-            tags$div(
-                class = "container",
+            tags$p(
+                # class = "container",
                 tags$a(paste('See', length(rv$pmid), 'citations in PubMed'),
                        href = paste0('https://www.ncbi.nlm.nih.gov/pubmed/',
                                     paste(rv$pmid, collapse = ','))
@@ -335,8 +330,8 @@ shinyServer(function(input, output, session) {
             )
         } else {
             selected_id = sort(rv$pmid, decreasing = TRUE)[1:20]
-            tags$div(
-                class = "container",
+            tags$p(
+                # class = "container",
                 tags$a(paste('See over 100 citations in PubMed'),
                        href = paste0('https://www.ncbi.nlm.nih.gov/pubmed/',
                                      paste(selected_id, collapse = ','))

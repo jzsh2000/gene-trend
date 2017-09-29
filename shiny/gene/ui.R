@@ -20,7 +20,7 @@ shinyUI(fluidPage(
     # Application title
     titlePanel("Gene ID conversion (version: 2017-03-12)"),
 
-    tabsetPanel(
+    tabsetPanel(type = "tabs",
         tabPanel('Gene List', {
             # Sidebar with a slider input for number of bins
             sidebarLayout(
@@ -91,8 +91,15 @@ shinyUI(fluidPage(
                             fluidRow(
                                 column(width = 8,
                                        dataTableOutput("gene_table")),
+                                # column(width = 4)
                                 column(width = 4,
-                                       uiOutput('gene_summary'),
+                                       tags$div(class = "panel panel-default",
+                                                tags$div(class = 'panel-heading',
+                                                         'Gene Summary'),
+                                                tags$div(class = "panel-body",
+                                                        textOutput('gene_summary')
+                                                )
+                                       ),
                                        hr(),
                                        uiOutput('pmid'))
                             )
