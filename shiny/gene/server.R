@@ -8,9 +8,9 @@
 #
 
 library(shiny)
-library(shinyjs)
-library(DT)
-library(tidyverse)
+suppressMessages(library(shinyjs))
+suppressMessages(library(DT))
+suppressMessages(library(tidyverse))
 library(stringr)
 library(htmltools)
 

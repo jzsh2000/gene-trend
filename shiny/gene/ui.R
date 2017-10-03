@@ -8,8 +8,8 @@
 #
 
 library(shiny)
-library(shinyjs)
-library(DT)
+suppressMessages(library(shinyjs))
+suppressMessages(library(DT))
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
