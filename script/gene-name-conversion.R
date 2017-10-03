@@ -12,6 +12,9 @@ dir.create('data/current/robj', showWarnings = FALSE)
 immuno <- as.integer(read_lines("data/current/topic/immunology.txt.gz"))
 tumor <- as.integer(read_lines("data/current/topic/neoplasms.txt.gz"))
 
+writeLines(Sys.readlink('data/current'),
+           file.path('data/current/robj', 'VERSION'))
+
 walk2(unname(supported_species),
       names(supported_species),
       function(full_name, short_name) {
