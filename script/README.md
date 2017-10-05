@@ -1,6 +1,11 @@
 ## CD-molecules.R
 find CD molecules according to gene official names and synonyms, no output
 
+## create-gene-rdata.R
+prepare Rdata files used in a shiny application, which takes a list of gene
+names as input and output a table of detailed information about the genes in
+this list
+
 ## download-gene-info-xml.sh
 download NCBI gene xml for human and mouse<br/>
 it would be better to download gene asn.1 format and convert it to xml
@@ -36,11 +41,6 @@ output format (3-column tsv)
 
 ## gene-families-human.R
 find human gene families (genes with similar names) (for fun)
-
-## gene-name-conversion.R
-prepare Rdata files used in a shiny application, which takes a list of gene
-names as input and output a table of detailed information about the genes in
-this list
 
 ## gene-to-pdat.sh
 count number of pubmed articles for each gene in each month
