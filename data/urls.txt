@@ -1,3 +1,6 @@
+NCBI gene FTP site
+ftp://ftp.ncbi.nlm.nih.gov/gene
+
 pubmed baseline 2017 (total size: 21 GB)
 ftp://ftp.ncbi.nlm.nih.gov/pubmed/baseline/
 
