@@ -15,3 +15,7 @@ span.blue-box {
 span.green-box {
     border: 1px dotted green;
 }
+
+span.none {
+    color: grey;
+}

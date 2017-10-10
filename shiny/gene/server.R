@@ -309,7 +309,7 @@ shinyServer(function(input, output, session) {
 
     output$gene_summary <- renderText(
         ifelse(rv$summary == '',
-               'no gene summary',
+               '-',
                rv$summary)
     )
 
@@ -317,7 +317,7 @@ shinyServer(function(input, output, session) {
         if (length(rv$pmid) == 0) {
             tags$p(
                 # class = "container",
-                tags$span('no citations')
+                tags$span('no citations', class = "none")
             )
         }
         else if (length(rv$pmid) < 100) {

@@ -99,7 +99,8 @@ shinyUI(fluidPage(
                                                 tags$div(class = 'panel-heading',
                                                          'Gene Summary'),
                                                 tags$div(class = "panel-body",
-                                                        textOutput('gene_summary')
+                                                         # tags$span("hello")
+                                                         textOutput('gene_summary')
                                                 )
                                        ),
                                        hr(),
