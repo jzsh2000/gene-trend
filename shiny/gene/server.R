@@ -276,7 +276,7 @@ shinyServer(function(input, output, session) {
         gene_info = get_species()[['gene_info']] %>%
             mutate(Symbol =
                        paste0('<a ',
-                              'href="http://www.ncbi.nlm.nih.gov/gene/',
+                              'href="https://www.ncbi.nlm.nih.gov/gene/',
                               GeneID, '" ',
                               'target=_black ',
                               '>', Symbol,'</a>'))
