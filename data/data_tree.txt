@@ -1,0 +1,119 @@
+current/
+├── Homo_sapiens.gene2author
+├── Homo_sapiens.gene2pdat
+├── Homo_sapiens.gene2pubmed
+├── Homo_sapiens.gene_info
+├── Homo_sapiens.gene_order
+├── Homo_sapiens.gene_summary
+├── Mus_musculus.gene2author
+├── Mus_musculus.gene2pdat
+├── Mus_musculus.gene2pubmed
+├── Mus_musculus.gene_info
+├── Mus_musculus.gene_order
+├── Mus_musculus.gene_summary
+├── gene-mesh
+│   ├── 10090
+│   │   ├── gene-mesh-disease.maitrx.rds
+│   │   ├── gene-mesh-disease.major.maitrx.rds
+│   │   ├── gene-mesh-disease.major.tf-idf.rds
+│   │   ├── gene-mesh-disease.major.txt
+│   │   ├── gene-mesh-disease.tf-idf.rds
+│   │   ├── gene-mesh-disease.txt
+│   │   ├── gene-mesh-pdat.major.txt
+│   │   ├── gene-mesh-pubmed-pdat.major.txt
+│   │   ├── gene-mesh.maitrx.rds
+│   │   ├── gene-mesh.major.maitrx.rds
+│   │   ├── gene-mesh.major.tf-idf.rds
+│   │   ├── gene-mesh.major.txt
+│   │   ├── gene-mesh.tf-idf.rds
+│   │   └── gene-mesh.txt
+│   ├── 10116
+│   │   ├── gene-mesh-disease.maitrx.rds
+│   │   ├── gene-mesh-disease.major.maitrx.rds
+│   │   ├── gene-mesh-disease.major.tf-idf.rds
+│   │   ├── gene-mesh-disease.major.txt
+│   │   ├── gene-mesh-disease.tf-idf.rds
+│   │   ├── gene-mesh-disease.txt
+│   │   ├── gene-mesh-pdat.major.txt
+│   │   ├── gene-mesh-pubmed-pdat.major.txt
+│   │   ├── gene-mesh.maitrx.rds
+│   │   ├── gene-mesh.major.maitrx.rds
+│   │   ├── gene-mesh.major.tf-idf.rds
+│   │   ├── gene-mesh.major.txt
+│   │   ├── gene-mesh.tf-idf.rds
+│   │   └── gene-mesh.txt
+│   ├── 559292
+│   │   ├── gene-mesh-disease.maitrx.rds
+│   │   ├── gene-mesh-disease.major.maitrx.rds
+│   │   ├── gene-mesh-disease.major.tf-idf.rds
+│   │   ├── gene-mesh-disease.major.txt
+│   │   ├── gene-mesh-disease.tf-idf.rds
+│   │   ├── gene-mesh-disease.txt
+│   │   ├── gene-mesh-pdat.major.txt
+│   │   ├── gene-mesh-pubmed-pdat.major.txt
+│   │   ├── gene-mesh.maitrx.rds
+│   │   ├── gene-mesh.major.maitrx.rds
+│   │   ├── gene-mesh.major.tf-idf.rds
+│   │   ├── gene-mesh.major.txt
+│   │   ├── gene-mesh.tf-idf.rds
+│   │   └── gene-mesh.txt
+│   ├── 7227
+│   │   ├── gene-mesh-disease.maitrx.rds
+│   │   ├── gene-mesh-disease.major.maitrx.rds
+│   │   ├── gene-mesh-disease.major.tf-idf.rds
+│   │   ├── gene-mesh-disease.major.txt
+│   │   ├── gene-mesh-disease.tf-idf.rds
+│   │   ├── gene-mesh-disease.txt
+│   │   ├── gene-mesh-pdat.major.txt
+│   │   ├── gene-mesh-pubmed-pdat.major.txt
+│   │   ├── gene-mesh.maitrx.rds
+│   │   ├── gene-mesh.major.maitrx.rds
+│   │   ├── gene-mesh.major.tf-idf.rds
+│   │   ├── gene-mesh.major.txt
+│   │   ├── gene-mesh.tf-idf.rds
+│   │   └── gene-mesh.txt
+│   ├── 9606
+│   │   ├── gene-mesh-disease.maitrx.rds
+│   │   ├── gene-mesh-disease.major.maitrx.rds
+│   │   ├── gene-mesh-disease.major.tf-idf.rds
+│   │   ├── gene-mesh-disease.major.txt
+│   │   ├── gene-mesh-disease.tf-idf.rds
+│   │   ├── gene-mesh-disease.txt
+│   │   ├── gene-mesh-pdat.major.txt
+│   │   ├── gene-mesh-pubmed-pdat.major.txt
+│   │   ├── gene-mesh.maitrx.rds
+│   │   ├── gene-mesh.major.maitrx.rds
+│   │   ├── gene-mesh.major.tf-idf.rds
+│   │   ├── gene-mesh.major.txt
+│   │   ├── gene-mesh.tf-idf.rds
+│   │   └── gene-mesh.txt
+│   ├── blacklist.pmid
+│   ├── pubmed-gene-mesh.txt
+│   ├── pubmed-gene.filtered.txt
+│   └── pubmed-gene.txt
+├── gene-pdat.month.txt
+├── gene-pdat.year.txt
+├── gene2pubmed.gz
+├── gene_info.gz
+├── generifs_basic.gz
+├── genes-per-article
+│   ├── human.txt
+│   └── mouse.txt
+├── homologene.data
+├── pmid.info
+├── pmid.info2
+├── pmid.info3
+├── robj
+│   ├── VERSION
+│   ├── human-mouse-homologene.rds
+│   ├── human.RData
+│   ├── human.gene-group.rds
+│   ├── human.gene-group.stat.rds
+│   └── mouse.RData
+├── tax_id.info
+├── tax_id.top.txt
+└── topic
+    ├── immunology.txt.gz
+    └── neoplasms.txt.gz
+
+9 directories, 107 files
