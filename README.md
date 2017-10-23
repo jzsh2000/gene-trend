@@ -14,3 +14,17 @@ performed on the [R][R] programming environment.
 [ncbiftp]: ftp://ftp.ncbi.nlm.nih.gov/
 [edirect]: https://www.ncbi.nlm.nih.gov/news/02-06-2014-entrez-direct-released/
 [R]: https://cran.r-project.org/
+
+---
+
+Two shiny applications are included:
+
+gene
+----
+webpage: <https://jzsh2000.shinyapps.io/gene/>
+source code: https://github.com/jzsh2000/gene-trend/tree/master/shiny/gene
+
+gene-trend
+----------
+webpage: <https://jzsh2000.shinyapps.io/gene-trend/>
+source code: https://github.com/jzsh2000/gene-trend/tree/master/shiny/gene-trend
