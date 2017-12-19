@@ -57,8 +57,8 @@ shinyServer(function(input, output, session) {
 
     get_species <- reactive({
         species = input$species
-        print(paste('Load RData of', species))
-        load(file.path('robj', paste0(species, '.RData')))
+        # glue('Load RData of {species}')
+        load(file.path('robj', glue('{species}.RData')))
         return(list(
             species = species,
             gene_info = gene_info,
@@ -169,11 +169,8 @@ shinyServer(function(input, output, session) {
         search.res = get_search_result()[['matched']] %>%
             left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
             mutate(Symbol =
-                       paste0('<a ',
-                              'href="http://www.ncbi.nlm.nih.gov/gene/',
-                              GeneID, '" ',
-                              'target=_black ',
-                              '>', Symbol,'</a>'))
+                       glue('<a href="http://www.ncbi.nlm.nih.gov/gene/{GeneID}"
+                            target=_black>{Symbol}</a>'))
 
         if (input$orderby == 'na') {
             search.res = search.res %>%
@@ -189,17 +186,15 @@ shinyServer(function(input, output, session) {
         } else if (input$orderby == 'pubmed') {
             search.res = search.res %>%
                 arrange(pm_rank) %>%
-                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')'))
+                mutate(pubmed = glue('{pm_rank} ({pm_count})'))
         } else if (input$orderby == 'pubmed_immuno') {
             search.res = search.res %>%
                 arrange(pm_rank_immuno) %>%
-                mutate(pubmed = paste0(pm_rank_immuno,
-                                       ' (', pm_count_immuno, ')'))
+                mutate(pubmed = glue('{pm_rank_immuno} ({pm_count_immuno})'))
         } else if (input$orderby == 'pubmed_tumor') {
             search.res = search.res %>%
                 arrange(pm_rank_tumor) %>%
-                mutate(pubmed = paste0(pm_rank_tumor,
-                                       ' (', pm_count_tumor, ')'))
+                mutate(pubmed = glue('{pm_rank_tumor} ({pm_count_tumor})'))
         }
         rv$summary = ''
         rv$pmid = integer()
@@ -277,11 +272,8 @@ shinyServer(function(input, output, session) {
     output$gene_info_database <- DT::renderDataTable({
         gene_info = get_species()[['gene_info']] %>%
             mutate(Symbol =
-                       paste0('<a ',
-                              'href="https://www.ncbi.nlm.nih.gov/gene/',
-                              GeneID, '" ',
-                              'target=_black ',
-                              '>', Symbol,'</a>'))
+                       glue('<a href="http://www.ncbi.nlm.nih.gov/gene/{GeneID}"
+                            target=_black>{Symbol}</a>'))
 
         if (input$orderby == 'ncbi') {
             gene_info = gene_info %>%
@@ -289,17 +281,15 @@ shinyServer(function(input, output, session) {
         } else if (input$orderby == 'pubmed') {
             gene_info = gene_info %>%
                 arrange(pm_rank) %>%
-                mutate(pubmed = paste0(pm_rank, ' (', pm_count, ')'))
+                mutate(pubmed = glue('{pm_rank} ({pm_count})'))
         } else if (input$orderby == 'pubmed_immuno') {
             gene_info = gene_info %>%
                 arrange(pm_rank_immuno) %>%
-                mutate(pubmed = paste0(pm_rank_immuno,
-                                       ' (', pm_count_immuno, ')'))
+                mutate(pubmed = glue('{pm_rank_immuno} ({pm_count_immuno})'))
         } else if (input$orderby == 'pubmed_tumor') {
             gene_info = gene_info %>%
                 arrange(pm_rank_tumor) %>%
-                mutate(pubmed = paste0(pm_rank_tumor,
-                                       ' (', pm_count_tumor, ')'))
+                mutate(pubmed = glue('{pm_rank_tumor} ({pm_count_tumor})'))
         }
         gene_info %>%
             select(Symbol, Synonyms, description)
@@ -325,7 +315,7 @@ shinyServer(function(input, output, session) {
         else if (length(rv$pmid) < 100) {
             tags$p(
                 # class = "container",
-                tags$a(paste('See', length(rv$pmid), 'citations in PubMed'),
+                tags$a(glue('See {length(rv$pmid)} citations in PubMed'),
                        href = paste0('https://www.ncbi.nlm.nih.gov/pubmed/',
                                     paste(rv$pmid, collapse = ','))
                        )
@@ -359,8 +349,7 @@ shinyServer(function(input, output, session) {
                      tags$div(class = "panel-body fixed-panel",
                               tagList(
                                   tags$a('See all citations in PubMed',
-                                         href = paste0('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid=',
-                                                       get_selected_geneid())),
+                                         href = glue('https://www.ncbi.nlm.nih.gov/pubmed?LinkName=gene_pubmed&from_uid={get_selected_geneid()}')),
                                   get_pmid_link(sort(rv$pmid, decreasing = TRUE)[1:20])
                               )))
 
