@@ -21,10 +21,8 @@ Two shiny applications are included:
 
 gene
 ----
-webpage: <https://jzsh2000.shinyapps.io/gene/>
-source code: https://github.com/jzsh2000/gene-trend/tree/master/shiny/gene
+see <https://jzsh2000.shinyapps.io/gene/> \[[source code](shiny/gene)\]
 
 gene-trend
 ----------
-webpage: <https://jzsh2000.shinyapps.io/gene-trend/>
-source code: https://github.com/jzsh2000/gene-trend/tree/master/shiny/gene-trend
+see <https://jzsh2000.shinyapps.io/gene-trend/> \[[source code](shiny/gene-trend)\]
