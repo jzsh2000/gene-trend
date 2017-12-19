@@ -92,7 +92,14 @@ shinyUI(fluidPage(
                             title = "gene table",
                             fluidRow(
                                 column(width = 8,
-                                       dataTableOutput("gene_table")),
+                                       dataTableOutput("gene_table"),
+                                       hr(),
+                                       tags$div(class = 'btn-group',
+                                                downloadButton('d_symbol',
+                                                               label = 'Download gene symbol'),
+                                                downloadButton('d_entrezid',
+                                                               label = 'Download gene entrez id'))
+                                       ),
                                 # column(width = 4)
                                 column(width = 4,
                                        tags$div(class = "panel panel-default",

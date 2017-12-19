@@ -13,6 +13,8 @@ suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
 library(stringr)
 library(htmltools)
+suppressMessages(library(glue))
+suppressMessages(library(rvest))
 
 homologene <- read_rds('robj/human-mouse-homologene.rds')
 surface_marker <- read_rds('gene-list/surface-marker.rds')
@@ -371,6 +373,15 @@ shinyServer(function(input, output, session) {
         }
 
     })
+
+    output$d_symbol <- downloadHandler(
+        filename = 'gene_name.txt',
+        content = function(con) {
+            writeLines(map_chr(get_ordered_table()$Symbol,
+                               ~html_text(read_html(.))),
+                       con)
+        }
+    )
 
     observeEvent(input$clear, {
         rv$data <- NULL
