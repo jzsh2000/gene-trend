@@ -82,6 +82,7 @@ shinyServer(function(input, output, session) {
         ensembl2id = get_species()[['ensembl2id']]
 
         if (length(gene_list) == 0) {
+            disable('d_symbol')
             hideTab(inputId = 'output_panel', target = 'unmatched')
             return(list(
                 matched = tibble(name = character(),
@@ -89,6 +90,7 @@ shinyServer(function(input, output, session) {
                                  type = character()),
                 unmatched = character()))
         }
+        # enable('d_symbol')
         res.unmatched = gene_list
 
         res_part.id = gene_info %>%
@@ -143,6 +145,10 @@ shinyServer(function(input, output, session) {
                                 res_part.symbol,
                                 res_part.synonym,
                                 res_part.ensembl)
+
+        if (nrow(res.matched) > 0) {
+            enable('d_symbol')
+        }
 
         if (input$filterby != 'na') {
             if (input$filterby == 'surface') {
