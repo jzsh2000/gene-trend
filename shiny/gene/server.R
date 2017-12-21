@@ -40,7 +40,7 @@ shinyServer(function(input, output, session) {
     })
 
     get_gene_list <- reactive({
-        gene_list = str_split(input$gene, '\\n')[[1]] %>%
+        gene_list = str_split(input$gene, '[,\\s]+')[[1]] %>%
             map_chr(str_trim)
 
         # remove empty stings
@@ -48,7 +48,7 @@ shinyServer(function(input, output, session) {
     }) %>% debounce(1000)
 
     get_gene_list_2 <- reactive({
-        gene_list = str_split(input$gene_2, '\\n')[[1]] %>%
+        gene_list = str_split(input$gene_2, '[,\\s]+')[[1]] %>%
             map_chr(str_trim)
 
         # remove empty stings
