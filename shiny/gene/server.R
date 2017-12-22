@@ -83,6 +83,7 @@ shinyServer(function(input, output, session) {
 
         if (length(gene_list) == 0) {
             disable('d_symbol')
+            disable('d_entrezid')
             hideTab(inputId = 'output_panel', target = 'unmatched')
             return(list(
                 matched = tibble(name = character(),
@@ -148,6 +149,7 @@ shinyServer(function(input, output, session) {
 
         if (nrow(res.matched) > 0) {
             enable('d_symbol')
+            enable('d_entrezid')
         }
 
         if (input$filterby != 'na') {
@@ -373,7 +375,19 @@ shinyServer(function(input, output, session) {
         filename = 'gene_name.txt',
         content = function(con) {
             writeLines(map_chr(get_ordered_table()$Symbol,
-                               ~html_text(read_html(.))),
+                               ~html_text(read_html(.))) %>%
+                           unique(),
+                       con)
+        }
+    )
+
+    output$d_entrezid <- downloadHandler(
+        filename = 'gene_id.txt',
+        content = function(con) {
+            writeLines(map_chr(get_ordered_table()$Symbol,
+                               ~basename(html_attr(html_node(read_html(.), 'a'),
+                                                   'href'))) %>%
+                           unique(),
                        con)
         }
     )

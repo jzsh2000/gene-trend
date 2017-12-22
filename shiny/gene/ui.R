@@ -98,7 +98,6 @@ shinyUI(fluidPage(
                                                 downloadButton('d_symbol',
                                                                label = 'Download gene symbol'),
                                                 downloadButton('d_entrezid',
-                                                               class = 'disabled',
                                                                label = 'Download gene entrez id'))
                                        ),
                                 # column(width = 4)
