@@ -1,5 +1,8 @@
+gene (shiny application)
+========================
+
 About
-=====
+-----
 This shiny application will be mainly used to sort human and mouse genes in
 various orders.
 
@@ -17,6 +20,6 @@ The human genes can be filtered to show the [surface markers][surface_marker].
 [surface_marker]: http://www.proteinatlas.org/search/protein_class:Predicted+membrane+proteins
 
 Live Demo
-=========
+---------
 This application is deployed on `shinyapps.io`, you could access the following
-link to test the application: <https://jzsh2000.shinyapps.io/gene>
+link to have a try: <https://jzsh2000.shinyapps.io/gene>

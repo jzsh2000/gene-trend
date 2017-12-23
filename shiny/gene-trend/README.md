@@ -1,5 +1,8 @@
+gene-trend (shiny application)
+==============================
+
 About
-=====
+-----
 This shiny application has two functionalities:
 
 1. Show the most studies human and mouse genes (can be filtered by a date range
@@ -32,6 +35,6 @@ Top mouse genes of 2016:
 10. [Tlr4](https://www.ncbi.nlm.nih.gov/gene/21898) (toll-like receptor 4)
 
 Live Demo
-=========
+---------
 This application is deployed on `shinyapps.io`, you could access the following
-link to test the application: <https://jzsh2000.shinyapps.io/gene-trend>
+link to have a try: <https://jzsh2000.shinyapps.io/gene-trend>
