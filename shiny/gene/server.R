@@ -302,9 +302,10 @@ shinyServer(function(input, output, session) {
         gene_info %>%
             select(Symbol, Synonyms, description)
     },
-    escape = FALSE,
-    rownames = FALSE,
-    selection = 'single'
+    filter = 'top',
+    escape = c(-2),
+    rownames = TRUE,
+    selection = 'none'
     )
 
     output$gene_summary <- renderText(
