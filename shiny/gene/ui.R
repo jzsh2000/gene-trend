@@ -120,7 +120,17 @@ shinyUI(fluidPage(
                         ),
                         tabPanel(
                             title = 'database',
-                            dataTableOutput("gene_info_database")
+                            dataTableOutput("gene_info_database"),
+                            hr(),
+                            tags$p('See also:',
+                                   tags$ul(
+                                       tags$li(
+                                           tags$a('https://www.ncbi.nlm.nih.gov/gene', href = 'https://www.ncbi.nlm.nih.gov/gene', target = '_blank')
+                                           ),
+                                       tags$li(
+                                           tags$a('ftp://ftp.ncbi.nih.gov/gene/', href = 'ftp://ftp.ncbi.nih.gov/gene/', target = '_blank'))
+                                       )
+                            )
                         )
                     )
                 )

@@ -300,7 +300,8 @@ shinyServer(function(input, output, session) {
                 mutate(pubmed = glue('{pm_rank_tumor} ({pm_count_tumor})'))
         }
         gene_info %>%
-            select(Symbol, Synonyms, description)
+            select(Symbol, Synonyms, description, type_of_gene) %>%
+            mutate(type_of_gene = as.factor(type_of_gene))
     },
     filter = 'top',
     escape = c(-2),
