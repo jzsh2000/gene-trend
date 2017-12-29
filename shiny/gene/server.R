@@ -227,7 +227,7 @@ shinyServer(function(input, output, session) {
         get_ordered_table() %>%
             select(-GeneID)
     },
-    rownames = FALSE,
+    # rownames = FALSE,
     server = FALSE,
     escape = FALSE,
     selection = 'single',
@@ -244,10 +244,10 @@ shinyServer(function(input, output, session) {
                      text = 'Download'
                  ),
                  list(extend = 'colvis',
-                      columns = c(0,1,3,4,5,6,7,8))
+                      columns = c(1:2,4:9))
             ),
         columnDefs = list(list(visible = FALSE,
-                               targets = c(0,1,4,6,7))),
+                               targets = c(1:2,4:5,7:8))),
         scrollX = TRUE
     ))
 
