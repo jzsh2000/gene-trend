@@ -12,6 +12,7 @@ library(shinyjs)
 library(DT)
 library(tidyverse)
 library(stringr)
+library(glue)
 library(lubridate)
 # library(magrittr)
 library(plotly)
@@ -103,8 +104,7 @@ shinyServer(function(input, output, session) {
         }
     })
 
-    output$top_gene <- DT::renderDataTable({
-
+    get_top_gene <- reactive({
         gene_info = get_dat()$gene_info
         mesh_ = get_input_value()$mesh
         # gene2pdat = get_dat()$gene2pdat
@@ -160,11 +160,7 @@ shinyServer(function(input, output, session) {
                 base_url_gene = 'https://www.ncbi.nlm.nih.gov/gene'
                 base_url_pubmed = 'https://www.ncbi.nlm.nih.gov/pubmed'
                 out_dat = out_dat %>%
-                    mutate(Articles = paste0('<a href="', base_url_pubmed,
-                                             '?LinkName=gene_pubmed&from_uid=',
-                                             GeneID,
-                                             '" target=_blank>',
-                                             Articles, '</a>'))
+                    mutate(Articles = glue('<a href="{base_url_pubmed}?LinkName=gene_pubmed&from_uid={GeneID}" target=_blank>{Articles}</a>'))
             }
         } else {
             year_bot = get_input_value()$date[1]
@@ -195,14 +191,12 @@ shinyServer(function(input, output, session) {
                 mutate(rank_diff = rank_prev - rank) %>%
                 select(GeneID, Symbol, Synonyms, description, count, rank_diff) %>%
                 dplyr::rename(Description = description, Articles = count) %>%
-                mutate(Symbol = paste0('<a href="https://www.ncbi.nlm.nih.gov/gene/',
-                                       GeneID, '" target=_blank>',
-                                       Symbol,'</a>')) %>%
+                mutate(Symbol = glue('<a href="https://www.ncbi.nlm.nih.gov/gene/{GeneID}" target=_blank>{Symbol}</a>')) %>%
                 mutate(`Ranking change` = map_chr(rank_diff, function(x) {
                     if (x > 0) {
-                        paste0('<span style="color:green">▲</span>', x)
+                        glue('<span style="color:green">▲</span>{x}')
                     } else if (x < 0) {
-                        paste0('<span style="color:red">▼</span>', -x)
+                        glue('<span style="color:red">▼</span>-{x}')
                     } else {
                         return('-')
                     }
@@ -210,11 +204,12 @@ shinyServer(function(input, output, session) {
                 select(-rank_diff)
         }
         base_url_gene = 'https://www.ncbi.nlm.nih.gov/gene'
-        out_dat = out_dat %>%
-            mutate(Symbol = paste0('<a href="', base_url_gene, '/',
-                                   GeneID, '" target=_blank>',
-                                   Symbol,'</a>'))
-    },
+        list(top_gene = out_dat %>%
+            mutate(Symbol = glue('<a href="{base_url_gene}/{GeneID}" target=_blank>{Symbol}</a>')))
+    })
+
+    output$top_gene <- DT::renderDataTable(
+        get_top_gene()$top_gene,
     escape = FALSE,
     selection = 'single',
     extension = 'Buttons',
@@ -231,7 +226,7 @@ shinyServer(function(input, output, session) {
                             columns = c(1,3:6))
                             # columns = c(1,3:ifelse(input$useall_date, 5, 6)))
         ),
-        columnDefs = list(list(visible = FALSE, targets = c(3, 5)))
+        columnDefs = list(list(visible = FALSE, targets = c(3, 5, 6)))
     ))
 
     output$gene_plot <- renderPlotly({
@@ -269,8 +264,7 @@ shinyServer(function(input, output, session) {
                          ylab('Number of articles') +
                          ylim(0, NA) +
                          scale_colour_hue(limits = levels(gene_dat$rank_group)) +
-                         ggtitle(paste0(gene_name,
-                                        ' (',gene_description, ')')) +
+                         ggtitle(glue('{gene_name} ({gene_description})')) +
                          theme_bw(),
                      tooltip = c('year', 'count', 'rank'))
         } else {
