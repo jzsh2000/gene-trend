@@ -429,6 +429,11 @@ shinyServer(function(input, output, session) {
         if (!is.null(input$gene_table_row_last_clicked)) {
             row.idx = input$gene_table_row_last_clicked
             rv$summary = get_ordered_table()$Summary[row.idx]
+            shinyjs::html('summary_head',
+                          paste0('Gene Summary (',
+                                 get_ordered_table()$Symbol[row.idx],
+                                 ')'),
+                          add = FALSE)
 
             gene_id = get_selected_geneid()
             if (input$orderby == 'pubmed_immuno') {

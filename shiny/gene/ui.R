@@ -104,6 +104,7 @@ shinyUI(fluidPage(
                                 column(width = 4,
                                        tags$div(class = "panel panel-default",
                                                 tags$div(class = 'panel-heading',
+                                                         id = 'summary_head',
                                                          'Gene Summary'),
                                                 tags$div(class = "panel-body",
                                                          # tags$span("hello")
