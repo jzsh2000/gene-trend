@@ -224,32 +224,33 @@ shinyServer(function(input, output, session) {
     })
 
     output$gene_table = DT::renderDataTable({
-        get_ordered_table() %>%
-            select(-GeneID)
+        DT::datatable(get_ordered_table() %>% select(-c(GeneID, name)),
+                  rownames = get_ordered_table()$name,
+                  escape = FALSE,
+                  selection = 'single',
+                  extension = 'Buttons',
+                  options = list(
+                      lengthMenu = list(c(10, 25, 50, 100, -1),
+                                        c('10', '25', '50', '100', 'ALL')),
+                      dom = 'Bfrtip',
+                      buttons =
+                          list('copy',
+                               list(
+                                   extend = 'collection',
+                                   buttons = c('csv', 'excel', 'pdf'),
+                                   text = 'Download'
+                               ),
+                               list(extend = 'colvis',
+                                    columns = c(1,3:8))
+                          ),
+                      columnDefs = list(list(visible = FALSE,
+                                             targets = c(1,3:4,6:7))),
+                      scrollX = TRUE)
+        )
     },
     # rownames = FALSE,
-    server = FALSE,
-    escape = FALSE,
-    selection = 'single',
-    extension = 'Buttons',
-    options = list(
-        lengthMenu = list(c(10, 25, 50, 100, -1),
-                          c('10', '25', '50', '100', 'ALL')),
-        dom = 'Bfrtip',
-        buttons =
-            list('copy',
-                 list(
-                     extend = 'collection',
-                     buttons = c('csv', 'excel', 'pdf'),
-                     text = 'Download'
-                 ),
-                 list(extend = 'colvis',
-                      columns = c(1:2,4:9))
-            ),
-        columnDefs = list(list(visible = FALSE,
-                               targets = c(1:2,4:5,7:8))),
-        scrollX = TRUE
-    ))
+    server = FALSE
+    )
 
     output$unmatched <- renderText({
         paste(get_unmatched(), collapse = '\n')
