@@ -19,6 +19,8 @@ suppressMessages(library(rvest))
 homologene <- read_rds('robj/human-mouse-homologene.rds')
 surface_marker <- read_rds('gene-list/surface-marker.rds')
 cd_molecules <- read_rds('gene-list/cd.rds')
+load('robj/human.RData')
+load('robj/mouse.RData')
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
@@ -57,17 +59,21 @@ shinyServer(function(input, output, session) {
 
     get_species <- reactive({
         species = input$species
+        appendix = 'h'
+        if (species == 'mouse') {
+            appendix = 'm'
+        }
         # glue('Load RData of {species}')
-        load(file.path('robj', glue('{species}.RData')))
+
         return(list(
             species = species,
-            gene_info = gene_info,
-            symbol2id = symbol2id,
-            synonym2id = synonym2id,
-            ensembl2id = ensembl2id,
-            gene2pubmed = gene2pubmed,
-            gene2pubmed.immuno = gene2pubmed.immuno,
-            gene2pubmed.tumor = gene2pubmed.tumor
+            gene_info = get(glue('gene_info.{appendix}')),
+            symbol2id = get(glue('symbol2id.{appendix}')),
+            synonym2id = get(glue('synonym2id.{appendix}')),
+            ensembl2id = get(glue('ensembl2id.{appendix}')),
+            gene2pubmed = get(glue('gene2pubmed.{appendix}')),
+            gene2pubmed.immuno = get(glue('gene2pubmed.immuno.{appendix}')),
+            gene2pubmed.tumor = get(glue('gene2pubmed.tumor.{appendix}'))
             ))
     })
 
