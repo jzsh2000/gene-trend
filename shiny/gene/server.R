@@ -177,11 +177,16 @@ shinyServer(function(input, output, session) {
         gene_list[gene_list %in% gene_list.unmatched]
     })
 
-    get_ordered_table <- reactive({
+    get_matched_df <- reactive({
         gene_list = get_gene_list()
         gene_info = get_species()[['gene_info']]
-        search.res = get_search_result()[['matched']] %>%
-            left_join(gene_info, by = c('GeneID' = 'GeneID')) %>%
+        get_search_result()[['matched']] %>%
+            left_join(gene_info, by = c('GeneID' = 'GeneID'))
+    })
+
+    get_ordered_table <- reactive({
+        gene_list = get_gene_list()
+        search.res = get_matched_df() %>%
             mutate(Symbol =
                        glue('<a href="http://www.ncbi.nlm.nih.gov/gene/{GeneID}"
                             target=_black>{Symbol}</a>'))
@@ -383,8 +388,7 @@ shinyServer(function(input, output, session) {
     output$d_symbol <- downloadHandler(
         filename = 'gene_name.txt',
         content = function(con) {
-            writeLines(map_chr(get_ordered_table()$Symbol,
-                               ~html_text(read_html(.))) %>%
+            writeLines(get_matched_df()$Symbol %>%
                            unique(),
                        con)
         }
@@ -393,9 +397,8 @@ shinyServer(function(input, output, session) {
     output$d_entrezid <- downloadHandler(
         filename = 'gene_id.txt',
         content = function(con) {
-            writeLines(map_chr(get_ordered_table()$Symbol,
-                               ~basename(html_attr(html_node(read_html(.), 'a'),
-                                                   'href'))) %>%
+            writeLines(get_matched_df()$GeneID %>%
+                           as.character() %>%
                            unique(),
                        con)
         }
@@ -469,12 +472,18 @@ shinyServer(function(input, output, session) {
         if (length(gene_list) == 0) {
             tribble(~human_gene_name, ~mouse_gene_name)
         } else {
+            rv$data <- NULL
+            reset("gene_list_file")
+            updateTextAreaInput(session, 'gene', value = '')
+
             if (input$species_2 == 'h2m') {
+                updateRadioButtons(session, 'species', selected = 'human')
                 out_df = data_frame(human_gene_name = gene_list) %>%
                     left_join(homologene, by = 'human_gene_name') %>%
                     select(human_gene_name, mouse_gene_name) %>%
                     replace_na(list(mouse_gene_name = ''))
             } else {
+                updateRadioButtons(session, 'species', selected = 'mouse')
                 out_df = data_frame(mouse_gene_name = gene_list) %>%
                     left_join(homologene, by = 'mouse_gene_name') %>%
                     select(mouse_gene_name, human_gene_name) %>%
