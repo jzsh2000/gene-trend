@@ -22,6 +22,34 @@ cd_molecules <- read_rds('gene-list/cd.rds')
 load('robj/human.RData')
 load('robj/mouse.RData')
 
+all2id.h <- bind_rows(
+    symbol2id.h %>% rename(label = Symbol),
+    synonym2id.h %>% rename(label = Synonym),
+    ensembl2id.h %>% rename(label = Ensembl),
+    data_frame(label = as.character(gene_info.h$GeneID),
+               GeneID = gene_info.h$GeneID)
+)
+
+all2id.m <- bind_rows(
+    symbol2id.m %>% rename(label = Symbol),
+    synonym2id.m %>% rename(label = Synonym),
+    ensembl2id.m %>% rename(label = Ensembl),
+    data_frame(label = as.character(gene_info.m$GeneID),
+               GeneID = gene_info.m$GeneID)
+)
+
+alias_to_id <- function(gene_list, species = 'human') {
+    appendix = ifelse(species == 'mouse', 'm', 'h')
+    if (!exists(glue('gene_info.{appendix}'))) {
+        load(glue('robj/{species}.Rdata'))
+    }
+
+    data_frame(label = gene_list) %>%
+        unique() %>%
+        left_join(get(glue('all2id.{appendix}')), by = 'label') %>%
+        mutate(GeneID = as.character(GeneID))
+}
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
     rv <- reactiveValues(data = NULL,
@@ -478,21 +506,33 @@ shinyServer(function(input, output, session) {
 
             if (input$species_2 == 'h2m') {
                 updateRadioButtons(session, 'species', selected = 'human')
-                out_df = data_frame(human_gene_name = gene_list) %>%
-                    left_join(homologene, by = 'human_gene_name') %>%
-                    select(human_gene_name, mouse_gene_name) %>%
-                    replace_na(list(mouse_gene_name = ''))
+
+                gene_list_df = alias_to_id(gene_list, 'human')
+                out_df = gene_list_df %>%
+                    left_join(homologene, by = c('GeneID' = 'human_gene_id')) %>%
+                    select(label, human_gene_name, mouse_gene_name) %>%
+                    replace_na(list(
+                        human_gene_name = '',
+                        mouse_gene_name = ''
+                        )) %>%
+                    as.data.frame() %>%
+                    column_to_rownames('label')
             } else {
                 updateRadioButtons(session, 'species', selected = 'mouse')
-                out_df = data_frame(mouse_gene_name = gene_list) %>%
-                    left_join(homologene, by = 'mouse_gene_name') %>%
-                    select(mouse_gene_name, human_gene_name) %>%
-                    replace_na(list(human_gene_name = ''))
+
+                gene_list_df = alias_to_id(gene_list, 'mouse')
+                out_df = gene_list_df %>%
+                    left_join(homologene, by = c('GeneID' = 'mouse_gene_id')) %>%
+                    select(label, mouse_gene_name, human_gene_name) %>%
+                    replace_na(list(
+                        mouse_gene_name = '',
+                        human_gene_name = ''
+                        )) %>%
+                    as.data.frame() %>%
+                    column_to_rownames('label')
             }
             if (input$hide_unmatched) {
-                out_df %>%
-                    filter(human_gene_name != '',
-                           mouse_gene_name != '')
+                subset(out_df, human_gene_name != '' & mouse_gene_name != '')
             } else {
                 out_df
             }
