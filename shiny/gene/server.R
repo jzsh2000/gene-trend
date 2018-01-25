@@ -212,10 +212,11 @@ shinyServer(function(input, output, session) {
             left_join(gene_info, by = c('GeneID' = 'GeneID'))
     })
 
-    get_ordered_table <- reactive({
+    get_matched_df_full <- reactive({
         gene_list = get_gene_list()
         search.res = get_matched_df() %>%
-            mutate(Symbol =
+            mutate(Symbol.origin = Symbol,
+                   Symbol =
                        glue('<a href="http://www.ncbi.nlm.nih.gov/gene/{GeneID}"
                             target=_black>{Symbol}</a>'))
 
@@ -245,7 +246,13 @@ shinyServer(function(input, output, session) {
         }
         rv$summary = ''
         rv$pmid = integer()
-        search.res %>%
+
+        search.res
+    })
+
+    get_ordered_table <- reactive({
+
+        get_matched_df_full() %>%
             select(-c(dbXrefs, chromosome,
                       Symbol_from_nomenclature_authority,
                       Full_name_from_nomenclature_authority,
@@ -416,7 +423,7 @@ shinyServer(function(input, output, session) {
     output$d_symbol <- downloadHandler(
         filename = 'gene_name.txt',
         content = function(con) {
-            writeLines(get_matched_df()$Symbol %>%
+            writeLines(get_matched_df_full()$Symbol.origin %>%
                            unique(),
                        con)
         }
@@ -425,7 +432,7 @@ shinyServer(function(input, output, session) {
     output$d_entrezid <- downloadHandler(
         filename = 'gene_id.txt',
         content = function(con) {
-            writeLines(get_matched_df()$GeneID %>%
+            writeLines(get_matched_df_full()$GeneID %>%
                            as.character() %>%
                            unique(),
                        con)
