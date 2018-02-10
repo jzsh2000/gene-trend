@@ -34,7 +34,7 @@ efetch-pubmed:
 
 relink:
 	find data -type f -name current -delete
-	cd data/; ln -s ${date} current
+	cd data/; mkdir -p ${date}; ln -s ${date} current
 
 somework:
 	bash ./script/split-gene-info.sh
