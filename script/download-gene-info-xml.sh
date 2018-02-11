@@ -2,18 +2,25 @@
 set -ue
 cd $(dirname $0)/..
 
-outdir='data/current'
+outdir=${1:-.}
+mkdir -p ${outdir}/{human,mouse}
 
-cat $outdir/Homo_sapiens.gene_info \
+zcat $outdir/Homo_sapiens.gene_info.gz \
     | tail -n+2 \
     | cut -f 2 \
-    | parallel -N 1000 echo \
+    | parallel -N 200 echo \
     | tr ' ' ',' \
-    | parallel --jobs 1 --keep-order efetch -db gene -id {} -format xml '>' $outdir/human/{#}.xml
+    | parallel --jobs 1 --keep-order --verbose \
+        efetch -db gene -id {} -format xml \
+            '|' gzip -c \
+            '>' $outdir/human/{\#}.xml.gz
 
-cat $outdir/Mus_musculus.gene_info \
+zcat $outdir/Mus_musculus.gene_info.gz \
     | tail -n+2 \
     | cut -f 2 \
-    | parallel -N 1000 echo \
+    | parallel -N 200 echo \
     | tr ' ' ',' \
-    | parallel --jobs 1 --keep-order efetch -db gene -id {} -format xml '>' $outdir/mouse/{#}.xml
+    | parallel --jobs 1 --keep-order --verbose \
+        efetch -db gene -id {} -format xml \
+            '|' gzip -c \
+            '>' $outdir/mouse/{\#}.xml.gz

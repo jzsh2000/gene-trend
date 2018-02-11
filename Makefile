@@ -9,36 +9,48 @@ ifneq ($(wildcard ${outdir}/.),)
 update:
 	@echo "Already up-to-date."
 else
-update: download efetch-taxonomy efetch-pubmed relink somework
+update: download efetch-taxonomy efetch-pubmed generate-robj relink 
 endif
 
 download:
 	@echo "## current date: ${date}"
 	@mkdir -p ${outdir}
 	@echo "## download files"
-	wget -P ${outdir} ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz
+	# wget -P ${outdir} ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz
+	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
+	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Mus_musculus.gene_info.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2pubmed.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/GeneRIF/generifs_basic.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/pub/HomoloGene/current/homologene.data
+
+efetch-gene-order:
+	@echo "## fetch NCBI gene order"
 	bash ./script/ncbi-gene-order.sh ${outdir}
+
+efetch-gene-summary:
+	@echo "## fetch NCBI gene summary"
+	bash ./script/download-gene-info-xml.sh ${outdir}
+	bash ./script/extract-summary.sh ${outdir}
 
 efetch-taxonomy:
 	@echo "## fetch taxonomy information"
 	bash ./script/efetch-taxonomy.sh ${outdir}
 
 efetch-pubmed:
-	@echo "## fetch pubmed article information"
-	bash ./script/efetch-pubmed.sh ${outdir}
-	cd ${outdir}; bash ./script/search-pubmed-mesh-subheading.sh immunology
-	gzip ${outdir}/immunology.txt
+	@echo "## fetch pubmed topic information"
+	mkdir -p ${outdir}/topic
+	bash ./script/search-pubmed-mesh-subheading.sh immunology ${outdir}/topic
+	bash ./script/search-pubmed-mesh.sh neoplasms ${outdir}/topic
 
 relink:
-	find data -type f -name current -delete
+	@echo "## use new database as default"
+	find data -type l -name current -delete
 	cd data/; mkdir -p ${date}; ln -s ${date} current
 
-somework:
-	bash ./script/split-gene-info.sh
-	Rscript ./script/gene-name-conversion.R
+generate-robj:
+	bash ./script/split-species.sh ${outdir}
+	Rscript ./script/create-gene-rdata.R ${date}
 
+# BE CAREFUL
 clean:
 	rm -ir ${outdir}

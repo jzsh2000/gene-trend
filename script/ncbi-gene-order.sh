@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 prefix=${1:-.}
 
+echo "Homo sapiens"
 esearch -db gene -query '"Homo sapiens"[Organism] AND alive[prop]' \
         -sort 'Gene Weight' \
     | efetch -format tabular \
@@ -12,6 +13,7 @@ esearch -db gene -query '"Homo sapiens"[Organism] AND alive[prop]' \
     | cut -f3 \
     > ${prefix}/Homo_sapiens.gene_order
 
+echo "Mus musculus"
 esearch -db gene -query '"Mus musculus"[Organism] AND alive[prop]' \
         -sort 'Gene Weight' \
     | efetch -format tabular \
