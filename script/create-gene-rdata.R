@@ -1,43 +1,53 @@
 #!/usr/bin/env Rscript
 library(tidyverse)
-library(stringr)
+library(glue)
+library(here)
 
+species <- tribble(
+    ~full_name, ~short_name, ~tax_id, ~suffix, ~ensembl_pattern,
+    'Homo_sapiens', 'human', 9606, 'h', '(?<=Ensembl:)ENSG[0-9]*',
+    'Mus_musculus', 'mouse', 10090, 'm', '(?<=Ensembl:)ENSMUSG[0-9]*'
+)
 supported_species <- c(
     'human' = 'Homo_sapiens',
     'mouse' = 'Mus_musculus'
 )
+mydate = commandArgs(trailingOnly = TRUE)
+if (length(mydate) == 0 || 
+        !str_detect(mydate[1], '^\\d{4}-\\d{2}-\\d{2}$') ||
+        !file.exists(file.path(here(), 'data', mydate[1]))) {
+    cat('ERROR! should prepare raw data first\n')
+    q(save = 'no')
+}
+maindir = file.path(here(), 'data', mydate[1])
 
 # ========== prepare directory
-dir.create('data/current/robj', showWarnings = FALSE)
-immuno <- as.integer(read_lines("data/current/topic/immunology.txt.gz"))
-tumor <- as.integer(read_lines("data/current/topic/neoplasms.txt.gz"))
+dir.create(file.path(maindir, 'robj'), showWarnings = FALSE)
+write_lines(mydate[1], file.path(maindir, 'robj', 'VERSION'))
 
-writeLines(Sys.readlink('data/current'),
-           file.path('data/current/robj', 'VERSION'))
+immuno <- as.integer(read_lines(file.path(maindir, "topic", "immunology.txt")))
+tumor <- as.integer(read_lines(file.path(maindir, "topic", "neoplasms.txt")))
 
-walk2(unname(supported_species),
-      names(supported_species),
-      function(full_name, short_name) {
+walk(seq_len(nrow(species)),
+      function(n) {
+          tax_id = species$tax_id[n]
+          full_name = species$full_name[n]
+          short_name = species$short_name[n]
+          suffix = species$suffix[n]
+          ensembl_pattern = species$ensembl_pattern[n]
+
           print(paste('Species:', full_name))
-          gene_order_file = paste0('data/current/',full_name,'.gene_order')
-          gene_info_file = paste0('data/current/',full_name,'.gene_info')
-          gene_summary_file = paste0('data/current/',full_name,
-                                     '.gene_summary')
-          gene2pubmed_file = paste0('data/current/',full_name,
-                                    '.gene2pubmed')
-          rdata_file = paste0('data/current/robj/',short_name,'.RData')
-
-          ensembl_pattern = 'some_strange_pattern'
-          if (short_name == 'human') {
-              ensembl_pattern = '(?<=Ensembl:)ENSG[0-9]*'
-          } else if (short_name == 'mouse') {
-              ensembl_pattern = '(?<=Ensembl:)ENSMUSG[0-9]*'
-          }
+          gene_order_file = file.path(maindir, glue('{full_name}.gene_order'))
+          gene_info_file = file.path(maindir, glue('{full_name}.gene_info.gz'))
+          gene_summary_file = file.path(maindir, glue('{full_name}.gene_summary'))
+          gene2pubmed_file = file.path(maindir, glue('{full_name}.gene2pubmed'))
+          rdata_file = file.path(maindir, 'robj', glue('{short_name}.RData'))
 
           order <- suppressMessages(
-              read_tsv(gene_order_file,
-                       col_types = '__i______________')) %>%
-              mutate(order = seq_along(GeneID))
+              read_lines(gene_order_file) %>%
+                  as.integer() %>%
+                  enframe(name = 'order', value = 'GeneID')
+          )
 
           pmid = unique(read_tsv(gene2pubmed_file,col_types = '__i'))[[1]]
           pmid.immuno  = intersect(pmid, immuno)
@@ -69,14 +79,16 @@ walk2(unname(supported_species),
               mutate(pm_count_tumor = map_int(PubMed_ID, ~nrow(.))) %>%
               mutate(pm_rank_tumor = min_rank(desc(pm_count_tumor)))
 
-          gene_summary <- read_tsv(gene_summary_file,
+          gene_summary <- suppressWarnings(read_tsv(gene_summary_file,
                                    col_names = c('GeneID', 'Summary'),
-                                   col_types = 'ic') %>%
+                                   col_types = 'ic')) %>%
               replace_na(list(Summary = ''))
 
           gene_info <- suppressMessages(
               read_tsv(gene_info_file,
-                       col_types = '_ic_cccccccc_c_')) %>%
+                       col_types = 'iic_cccccccc_c__')) %>%
+              filter(`#tax_id` == tax_id) %>%
+              select(-`#tax_id`) %>%
               inner_join(as.tibble(order), by = c('GeneID' = 'GeneID')) %>%
               group_by(Symbol) %>%
               arrange(order) %>%
@@ -128,13 +140,16 @@ walk2(unname(supported_species),
               filter(n() == 1) %>%
               ungroup()
 
-          save(gene_info, symbol2id, synonym2id, ensembl2id,
-               gene2pubmed, gene2pubmed.immuno, gene2pubmed.tumor,
+          obj_list = c('gene_info', 'symbol2id', 'synonym2id', 'ensembl2id',
+                       'gene2pubmed', 'gene2pubmed.immuno', 'gene2pubmed.tumor')
+          walk2(obj_list, paste(obj_list, suffix, sep = '.'),
+                ~assign(.y, get(.x), envir=globalenv()))
+          save(list = paste(obj_list, suffix, sep = '.'),
                file = rdata_file)
       })
 
 # ========== homologene (human and mouse)
-homologene <- read_tsv('data/current/homologene.data',
+homologene <- read_tsv(file.path(maindir, 'homologene.data'),
          col_types = 'cccc__',
          col_names = c('id', 'tax_id', 'gene_id', 'gene_name')) %>%
     filter(tax_id %in% c('9606', '10090'))
@@ -152,4 +167,4 @@ homologene_mouse <- homologene %>%
     select(-tax_id)
 
 inner_join(homologene_human, homologene_mouse, by = 'id') %>%
-    write_rds('data/current/robj/human-mouse-homologene.rds')
+    write_rds(file.path(maindir, 'robj', 'human-mouse-homologene.rds'))
