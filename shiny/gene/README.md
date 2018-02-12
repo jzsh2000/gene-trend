@@ -19,6 +19,13 @@ The human genes can be filtered to show the [surface markers][surface_marker].
 [tumour]: https://www.ncbi.nlm.nih.gov/pubmed/?term=neoplasms%5Bmesh%5D
 [surface_marker]: http://www.proteinatlas.org/search/protein_class:Predicted+membrane+proteins
 
+Deploy
+------
+1. clone this repository
+2. run `make update` in the project root directory, which will download and
+   create data used by this application.
+3. start shiny application in [rstudio](https://www.rstudio.com/)
+
 Live Demo
 ---------
 This application is deployed on `shinyapps.io`, you could access the following
