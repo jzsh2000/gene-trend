@@ -19,6 +19,18 @@ The human genes can be filtered to show the [surface markers][surface_marker].
 [tumour]: https://www.ncbi.nlm.nih.gov/pubmed/?term=neoplasms%5Bmesh%5D
 [surface_marker]: http://www.proteinatlas.org/search/protein_class:Predicted+membrane+proteins
 
+Dependencies
+------------
+
+R packages:
+
+* [shiny](https://github.com/rstudio/shiny)
+* [shinyjs](https://github.com/daattali/shinyjs)
+* [DT](https://github.com/rstudio/DT)
+* [tidyverse](https://github.com/tidyverse/tidyverse)
+* [glue](https://github.com/tidyverse/glue)
+* [rvest](https://github.com/hadley/rvest)
+
 Deploy
 ------
 1. clone this repository
