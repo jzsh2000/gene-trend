@@ -3,15 +3,8 @@ library(tidyverse)
 library(glue)
 library(here)
 
-species <- tribble(
-    ~full_name, ~short_name, ~tax_id, ~suffix, ~ensembl_pattern,
-    'Homo_sapiens', 'human', 9606, 'h', '(?<=Ensembl:)ENSG[0-9]*',
-    'Mus_musculus', 'mouse', 10090, 'm', '(?<=Ensembl:)ENSMUSG[0-9]*'
-)
-supported_species <- c(
-    'human' = 'Homo_sapiens',
-    'mouse' = 'Mus_musculus'
-)
+species <- read_csv('data/species.csv', col_types = 'ccdcc')
+supported_species <- deframe(species %>% select(short_name, full_name))
 mydate = commandArgs(trailingOnly = TRUE)
 if (length(mydate) == 0 || 
         !str_detect(mydate[1], '^\\d{4}-\\d{2}-\\d{2}$') ||
