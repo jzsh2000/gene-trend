@@ -40,7 +40,7 @@ efetch-pubmed:
 	@echo "## fetch pubmed topic information"
 	mkdir -p ${outdir}/topic
 	bash ./script/search-pubmed-mesh-subheading.sh immunology ${outdir}/topic
-	bash ./script/search-pubmed-mesh.sh neoplasms ${outdir}/topic
+	bash ./script/search-pubmed-mesh-heading.sh neoplasms ${outdir}/topic
 
 relink:
 	@echo "## use new database as default"
