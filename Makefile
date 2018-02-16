@@ -39,8 +39,10 @@ efetch-taxonomy:
 efetch-pubmed:
 	@echo "## fetch pubmed topic information"
 	mkdir -p ${outdir}/topic
-	bash ./script/search-pubmed-mesh-subheading.sh immunology ${outdir}/topic
-	bash ./script/search-pubmed-mesh-heading.sh neoplasms ${outdir}/topic
+	parallel -j1 bash ./script/search-pubmed-mesh-heading.sh {} ${outdir}/topic \
+	    :::: data/mesh-heading.txt
+	parallel -j1 bash ./script/search-pubmed-mesh-subheading.sh {} ${outdir}/topic \
+	    :::: data/mesh-subheading.txt
 
 relink:
 	@echo "## use new database as default"
