@@ -98,9 +98,7 @@ shinyServer(function(input, output, session) {
             symbol2id = get(glue('symbol2id.{appendix}')),
             synonym2id = get(glue('synonym2id.{appendix}')),
             ensembl2id = get(glue('ensembl2id.{appendix}')),
-            gene2pubmed = get(glue('gene2pubmed.{appendix}')),
-            gene2pubmed.immuno = get(glue('gene2pubmed.immuno.{appendix}')),
-            gene2pubmed.tumor = get(glue('gene2pubmed.tumor.{appendix}'))
+            gene2pubmed = get(glue('gene2pubmed.{appendix}'))
             ))
     })
 
@@ -234,15 +232,14 @@ shinyServer(function(input, output, session) {
             search.res = search.res %>%
                 arrange(pm_rank) %>%
                 mutate(pubmed = glue('{pm_rank} ({pm_count})'))
-        } else if (input$orderby == 'pubmed_immuno') {
+        } else {
+            mesh_term = str_extract(input$orderby, '(?<=pubmed_).*')
             search.res = search.res %>%
-                arrange(pm_rank_immuno) %>%
-                mutate(pubmed = glue('{pm_rank_immuno} ({pm_count_immuno})'))
-        } else if (input$orderby == 'pubmed_tumor') {
-            search.res = search.res %>%
-                arrange(pm_rank_tumor) %>%
-                mutate(pubmed = glue('{pm_rank_tumor} ({pm_count_tumor})'))
+                arrange_(glue('pm_rank_{mesh_term}')) %>%
+                mutate(pubmed = paste0(.[[glue('pm_rank_{mesh_term}')]], ' (',
+                                       .[[glue('pm_count_{mesh_term}')]], ')'))
         }
+
         rv$summary = ''
         rv$pmid = integer()
 
@@ -334,17 +331,13 @@ shinyServer(function(input, output, session) {
                 arrange(order)
         } else if (input$orderby == 'pubmed') {
             gene_info = gene_info %>%
-                arrange(pm_rank) %>%
-                mutate(pubmed = glue('{pm_rank} ({pm_count})'))
-        } else if (input$orderby == 'pubmed_immuno') {
+                arrange(pm_rank)
+        } else if (str_detect(input$orderby, '^pubmed_')) {
+            mesh_term = str_extract(input$orderby, '(?<=pubmed_).*')
             gene_info = gene_info %>%
-                arrange(pm_rank_immuno) %>%
-                mutate(pubmed = glue('{pm_rank_immuno} ({pm_count_immuno})'))
-        } else if (input$orderby == 'pubmed_tumor') {
-            gene_info = gene_info %>%
-                arrange(pm_rank_tumor) %>%
-                mutate(pubmed = glue('{pm_rank_tumor} ({pm_count_tumor})'))
+                arrange_(glue('pm_rank_{mesh_term}'))
         }
+
         gene_info %>%
             select(Symbol, Synonyms, description, type_of_gene) %>%
             mutate(type_of_gene = as.factor(type_of_gene))
@@ -480,21 +473,16 @@ shinyServer(function(input, output, session) {
                           add = FALSE)
 
             gene_id = get_selected_geneid()
-            if (input$orderby == 'pubmed_immuno') {
-                gene2pubmed.immuno = get_species()[['gene2pubmed.immuno']]
-                rv$pmid = unname(
-                    unlist((gene2pubmed.immuno %>%
-                                filter(GeneID == gene_id))[['PubMed_ID']]))
-            } else if (input$orderby == 'pubmed_tumor') {
-                gene2pubmed.tumor = get_species()[['gene2pubmed.tumor']]
-                rv$pmid = unname(
-                    unlist((gene2pubmed.tumor %>%
-                                filter(GeneID == gene_id))[['PubMed_ID']]))
-            } else {
-                gene2pubmed = get_species()[['gene2pubmed']]
+            gene2pubmed = get_species()[['gene2pubmed']]
+            if (str_detect(input$orderby, '^pubmed_')) {
+                mesh_term = str_extract(input$orderby, '(?<=pubmed_).*')
                 rv$pmid = unname(
                     unlist((gene2pubmed %>%
-                                filter(GeneID == gene_id))[['PubMed_ID']]))
+                                filter(GeneID == gene_id))[[glue('pm_id_{mesh_term}')]]))
+            } else {
+                rv$pmid = unname(
+                    unlist((gene2pubmed %>%
+                                filter(GeneID == gene_id))[['pm_id']]))
             }
         }
     )

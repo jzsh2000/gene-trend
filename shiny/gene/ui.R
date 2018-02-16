@@ -12,6 +12,13 @@ suppressMessages(library(shinyjs))
 suppressMessages(library(DT))
 
 version = readLines('robj/VERSION')
+mesh_list = c(read_lines('robj/mesh.txt'))
+
+order_choices = set_names(
+    c('na', 'ncbi', 'pubmed', paste('pubmed', mesh_list, sep = '_')),
+    c('None', 'NCBI gene weight', 'PubMed articles',
+      paste0('PubMed articles (', mesh_list, ')'))
+)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -38,11 +45,7 @@ shinyUI(fluidPage(
                     selectizeInput(
                         inputId = 'orderby',
                         label = "Order by",
-                        choices = c('None' = 'na',
-                                    'NCBI gene weight' = 'ncbi',
-                                    'PubMed articles' = 'pubmed',
-                                    'PubMed articles (immunology)' = 'pubmed_immuno',
-                                    'PubMed articles (tumour)' = 'pubmed_tumor')
+                        choices = order_choices
                     ),
                     selectizeInput(
                         inputId = 'filterby',
