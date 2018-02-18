@@ -13,7 +13,6 @@ suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
 library(htmltools)
 suppressMessages(library(glue))
-suppressMessages(library(rvest))
 
 homologene <- read_rds('robj/human-mouse-homologene.rds')
 surface_marker <- read_rds('gene-list/surface-marker.rds')

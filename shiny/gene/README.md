@@ -21,6 +21,9 @@ The human genes can be filtered to show the [surface markers][surface_marker].
 
 Dependencies
 ------------
+Scripting tools:
+
+* GNU [parallel](https://www.gnu.org/software/parallel/)
 
 R packages:
 
@@ -29,7 +32,6 @@ R packages:
 * [DT](https://github.com/rstudio/DT)
 * [tidyverse](https://github.com/tidyverse/tidyverse)
 * [glue](https://github.com/tidyverse/glue)
-* [rvest](https://github.com/hadley/rvest)
 
 Deploy
 ------
