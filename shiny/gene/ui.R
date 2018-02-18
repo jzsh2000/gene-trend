@@ -10,6 +10,7 @@
 library(shiny)
 suppressMessages(library(shinyjs))
 suppressMessages(library(DT))
+suppressMessages(library(tidyverse))
 
 version = readLines('robj/VERSION')
 mesh_list = c(read_lines('robj/mesh.txt'))
