@@ -23,8 +23,10 @@ write_lines(mydate[1], file.path(maindir, 'robj', 'VERSION'))
 mesh_headings <- read_lines(file.path(datadir, "mesh-heading.txt"))
 mesh_subheadings <- read_lines(file.path(datadir, "mesh-subheading.txt"))
 
-write_lines(c(mesh_headings, mesh_subheadings),
-            path = file.path(maindir, 'robj', 'mesh.txt'))
+data_frame(mesh_term = c(mesh_headings, mesh_subheadings),
+           mesh_type = c(rep('heading', length(mesh_headings)),
+                         rep('subheading', length(mesh_subheadings)))) %>%
+    write_rds(file.path(maindir, 'robj', 'mesh.rds'))
 
 walk(seq_len(nrow(species)),
       function(n) {
@@ -134,7 +136,10 @@ walk(seq_len(nrow(species)),
               filter(n() == 1) %>%
               ungroup()
 
-          obj_list = c('gene_info', 'symbol2id', 'synonym2id', 'ensembl2id',
+          obj_list = c('gene_info',
+                       'symbol2id',
+                       'synonym2id',
+                       'ensembl2id',
                        'gene2pubmed')
           walk2(obj_list, paste(obj_list, suffix, sep = '.'),
                 ~assign(.y, get(.x), envir=globalenv()))

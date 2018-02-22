@@ -13,7 +13,7 @@ suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
 
 version = readLines('robj/VERSION')
-mesh_list = c(read_lines('robj/mesh.txt'))
+mesh_list = read_rds('robj/mesh.rds') %>% pull(mesh_term)
 
 order_choices = set_names(
     c('na', 'ncbi', 'pubmed', paste('pubmed', mesh_list, sep = '_')),
