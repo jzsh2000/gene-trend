@@ -33,7 +33,7 @@ walk(seq_len(nrow(species)),
           tax_id = species$tax_id[n]
           full_name = species$full_name[n]
           short_name = species$short_name[n]
-          suffix = species$suffix[n]
+          suffix = species$short_name[n]
           ensembl_pattern = species$ensembl_pattern[n]
 
           print(paste('Species:', full_name))

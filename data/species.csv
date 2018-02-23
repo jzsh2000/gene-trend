@@ -1,9 +1,8 @@
 # full_name: species full name (official name)
 # short_name: species short name
 # tax_id: NCBI taxonomy id (e.g. https://www.ncbi.nlm.nih.gov/taxonomy/?term=human)
-# suffix: suffix for R object name
-# ensembl_pattern: Ensembl gene id pattern
+# ensembl_pattern: Ensembl gene id pattern (regular expression)
 #
-full_name,short_name,tax_id,suffix,ensembl_pattern
-Homo_sapiens,human,9606,h,(?<=Ensembl:)ENSG[0-9]*
-Mus_musculus,mouse,10090,m,(?<=Ensembl:)ENSMUSG[0-9]*
+full_name,short_name,tax_id,ensembl_pattern
+Homo_sapiens,human,9606,(?<=Ensembl:)ENSG[0-9]*
+Mus_musculus,mouse,10090,(?<=Ensembl:)ENSMUSG[0-9]*
