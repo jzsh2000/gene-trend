@@ -4,7 +4,22 @@ library(magrittr)
 library(glue)
 library(here)
 
-species <- read_csv('data/species.csv', col_types = 'ccdcc', comment = '#')
+get_prefix <- function(vec) {
+    if (length(vec) != length(unique(vec))) {
+        return(NULL)
+    }
+
+    unname(sapply(vec, function(x) {
+        x_len = str_length(x)
+        x_score = sapply(1:x_len, function(len) {
+            sum(str_sub(vec, end = len) == str_sub(x, end = len))
+        })
+        # print(x_score)
+        str_sub(x, end = which(x_score == 1)[1])
+    }))
+}
+species <- read_csv('data/species.csv', col_types = 'ccdc', comment = '#') %>%
+    mutate(suffix = get_prefix(short_name))
 
 mydate = commandArgs(trailingOnly = TRUE)
 if (length(mydate) == 0 ||
@@ -28,12 +43,14 @@ data_frame(mesh_term = c(mesh_headings, mesh_subheadings),
                          rep('subheading', length(mesh_subheadings)))) %>%
     write_rds(file.path(maindir, 'robj', 'mesh.rds'))
 
+write_rds(species, path = file.path(maindir, 'robj', 'species.rds'))
+
 walk(seq_len(nrow(species)),
       function(n) {
           tax_id = species$tax_id[n]
           full_name = species$full_name[n]
           short_name = species$short_name[n]
-          suffix = species$short_name[n]
+          suffix = species$suffix[n]
           ensembl_pattern = species$ensembl_pattern[n]
 
           print(paste('Species:', full_name))

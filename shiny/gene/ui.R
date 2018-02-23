@@ -14,6 +14,7 @@ suppressMessages(library(tidyverse))
 
 version = readLines('robj/VERSION')
 mesh_list = read_rds('robj/mesh.rds') %>% pull(mesh_term)
+species = read_rds('robj/species.rds')
 
 order_choices = set_names(
     c('na', 'ncbi', 'pubmed', paste('pubmed', mesh_list, sep = '_')),
@@ -39,9 +40,9 @@ shinyUI(fluidPage(
                     radioButtons(
                         inputId = 'species',
                         label = 'Species',
-                        choices = c('Homo sapiens' = 'human',
-                                    'Mus musculus' = 'mouse'),
-                        selected = "human"
+                        choices = deframe(species %>%
+                                              dplyr::select(full_name,
+                                                            short_name))
                     ),
                     selectizeInput(
                         inputId = 'orderby',

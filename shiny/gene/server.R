@@ -14,37 +14,34 @@ suppressMessages(library(tidyverse))
 library(htmltools)
 suppressMessages(library(glue))
 
+species_df = read_rds('robj/species.rds')
 homologene <- read_rds('robj/human-mouse-homologene.rds')
 surface_marker <- read_rds('gene-list/surface-marker.rds')
 cd_molecules <- read_rds('gene-list/cd.rds')
-load('robj/human.RData')
-load('robj/mouse.RData')
 
-all2id.h <- bind_rows(
-    symbol2id.h %>% rename(label = Symbol),
-    synonym2id.h %>% rename(label = Synonym),
-    ensembl2id.h %>% rename(label = Ensembl),
-    data_frame(label = as.character(gene_info.h$GeneID),
-               GeneID = gene_info.h$GeneID)
-)
-
-all2id.m <- bind_rows(
-    symbol2id.m %>% rename(label = Symbol),
-    synonym2id.m %>% rename(label = Synonym),
-    ensembl2id.m %>% rename(label = Ensembl),
-    data_frame(label = as.character(gene_info.m$GeneID),
-               GeneID = gene_info.m$GeneID)
-)
+for (species in species_df$short_name) {
+    load(glue('robj/{species}.RData'))
+    suffix = species_df$suffix[species_df$short_name == species]
+    assign(glue('all2id.{suffix}'),
+           bind_rows(
+               get(glue('symbol2id.{suffix}')) %>% rename(label = Symbol),
+               get(glue('synonym2id.{suffix}')) %>% rename(label = Synonym),
+               get(glue('ensembl2id.{suffix}')) %>% rename(label = Ensembl),
+               data_frame(
+                   label = as.character(get(glue('gene_info.{suffix}'))$GeneID),
+                   GeneID = get(glue('gene_info.{suffix}'))$GeneID
+               )
+           ))
+}
 
 alias_to_id <- function(gene_list, species = 'human') {
-    appendix = ifelse(species == 'mouse', 'm', 'h')
-    if (!exists(glue('gene_info.{appendix}'))) {
+    if (!exists(glue('gene_info.{species}'))) {
         load(glue('robj/{species}.Rdata'))
     }
 
     data_frame(label = gene_list) %>%
         unique() %>%
-        left_join(get(glue('all2id.{appendix}')), by = 'label') %>%
+        left_join(get(glue('all2id.{species}')), by = 'label') %>%
         mutate(GeneID = as.character(GeneID))
 }
 
