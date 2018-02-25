@@ -19,7 +19,7 @@ download:
 	# wget -P ${outdir} ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene_info.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Mammalia/Mus_musculus.gene_info.gz
-	wget -P ${outdir} ftp://ftp.ncbi.nlm.nih.gov/gene/DATA/gene2pubmed.gz
+	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/DATA/gene2pubmed.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/gene/GeneRIF/generifs_basic.gz
 	wget -P ${outdir} ftp://ftp.ncbi.nih.gov/pub/HomoloGene/current/homologene.data
 
