@@ -11,7 +11,7 @@ The origin data are either downloaded from [NCBI FTP site][ncbiftp] or fetched
 using NCBI's [Entrez Direct][edirect] toolkit. Data analysis will be mainly
 performed on the [R][R] programming environment.
 
-[ncbiftp]: ftp://ftp.ncbi.nih.gov/gene
+[ncbiftp]: http://bit.ly/2HJyRfL
 [edirect]: https://www.ncbi.nlm.nih.gov/news/02-06-2014-entrez-direct-released/
 [R]: https://cran.r-project.org/
 
