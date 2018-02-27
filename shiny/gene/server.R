@@ -270,8 +270,6 @@ shinyServer(function(input, output, session) {
                   selection = 'single',
                   extension = 'Buttons',
                   options = list(
-                      lengthMenu = list(c(10, 25, 50, 100, -1),
-                                        c('10', '25', '50', '100', 'ALL')),
                       dom = 'Bfrtip',
                       buttons =
                           list('copy',
@@ -281,10 +279,10 @@ shinyServer(function(input, output, session) {
                                    text = 'Download'
                                ),
                                list(extend = 'colvis',
-                                    columns = c(1,3:8))
+                                    columns = c(1,3:9))
                           ),
                       columnDefs = list(list(visible = FALSE,
-                                             targets = c(1,3:4,6:7))),
+                                             targets = c(1,3:4,6:8))),
                       scrollX = TRUE)
         )
     },
