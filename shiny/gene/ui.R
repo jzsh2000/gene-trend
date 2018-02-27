@@ -37,7 +37,39 @@ shinyUI(fluidPage(
             sidebarLayout(
                 sidebarPanel(
                     width = 3,
-                    radioButtons(
+
+                    fileInput(
+                        inputId = 'gene_list_file',
+                        label = 'Upload gene list',
+                        accept = 'text/plain'
+                    ),
+                    fluidRow(
+                        column(width = 9,
+                               textAreaInput(
+                                   inputId = 'gene',
+                                   label = "Gene List",
+                                   height = '200px',
+                                   placeholder = 'Your awesome gene list'
+                               )),
+                        column(width = 3,
+                               actionButton(inputId = 'clear', label = 'clear'),
+                               hr(),
+                               actionLink(inputId = 'list1',
+                                          label = tags$span('List 1',
+                                                            class = 'red-box')),
+                               br(),
+                               actionLink(inputId = 'list2',
+                                          label = tags$span('List 2',
+                                                            class = 'blue-box')),
+                               br(),
+                               actionLink(inputId = 'list3',
+                                          label = tags$span('List 3',
+                                                            class = 'green-box')))
+                    ),
+
+                    hr(),
+
+                    selectizeInput(
                         inputId = 'species',
                         label = 'Species',
                         choices = deframe(species %>%
@@ -55,35 +87,6 @@ shinyUI(fluidPage(
                         choices = c('None' = 'na',
                                     'Surface Marker' = 'surface',
                                     'CD Molecules' = 'cd')
-                    ),
-                    hr(),
-                    fileInput(
-                        inputId = 'gene_list_file',
-                        label = 'Upload gene list',
-                        accept = 'text/plain'
-                    ),
-                    fluidRow(
-                        column(width = 9,
-                               textAreaInput(
-                                   inputId = 'gene',
-                                   label = "Gene List",
-                                   height = '200px',
-                                   placeholder = 'Your awesome gene list'
-                               )),
-                        column(width = 3,
-                               actionLink(inputId = 'clear', label = 'clear'),
-                               hr(),
-                               actionLink(inputId = 'list1',
-                                          label = tags$span('List 1',
-                                                            class = 'red-box')),
-                               br(),
-                               actionLink(inputId = 'list2',
-                                          label = tags$span('List 2',
-                                                            class = 'blue-box')),
-                               br(),
-                               actionLink(inputId = 'list3',
-                                          label = tags$span('List 3',
-                                                            class = 'green-box')))
                     ),
                     tableOutput('gene_list_summary')
                 ),
