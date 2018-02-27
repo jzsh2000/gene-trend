@@ -31,17 +31,19 @@ for (species in species_df$short_name) {
                    label = as.character(get(glue('gene_info.{suffix}'))$GeneID),
                    GeneID = get(glue('gene_info.{suffix}'))$GeneID
                )
-           ))
+           ),
+           envir = globalenv())
 }
 
 alias_to_id <- function(gene_list, species = 'human') {
+    suffix = species_df$suffix[species_df$short_name == species]
     if (!exists(glue('gene_info.{species}'))) {
         load(glue('robj/{species}.Rdata'))
     }
 
     data_frame(label = gene_list) %>%
         unique() %>%
-        left_join(get(glue('all2id.{species}')), by = 'label') %>%
+        left_join(get(glue('all2id.{suffix}')), by = 'label') %>%
         mutate(GeneID = as.character(GeneID))
 }
 
