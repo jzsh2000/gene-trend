@@ -73,7 +73,11 @@ shinyUI(fluidPage(
                         inputId = 'species',
                         label = 'Species',
                         choices = deframe(species %>%
-                                              dplyr::select(full_name,
+                                              dplyr::mutate(
+                                                  name = str_replace_all(full_name, '_', ' '),
+                                                  name = glue('{short_name} ({name})')
+                                              ) %>%
+                                              dplyr::select(name,
                                                             short_name))
                     ),
                     selectizeInput(
