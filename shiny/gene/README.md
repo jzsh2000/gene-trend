@@ -36,8 +36,15 @@ R packages:
 Deploy
 ------
 1. clone this repository
+   ```bash
+   git clone https://github.com/jzsh2000/gene-trend.git
+   ```
 2. run `make update` in the project root directory, which will download and
-   create data used by this application.
+   create data used by this application. This step may take a few hours.
+   ```bash
+   cd gene-trend
+   make update
+   ```
 3. start shiny application in [rstudio](https://www.rstudio.com/)
 
 Live Demo
