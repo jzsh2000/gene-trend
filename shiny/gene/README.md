@@ -13,7 +13,10 @@ Currently following orders are supported:
 * PubMed articles ([immunology][immunology])
 * PubMed articles ([tumour][tumour])
 
-The human genes can be filtered to show the [surface markers][surface_marker].
+If you want to add more ordering, you could edit the MeSH term files
+[mesh-heading.txt](../../data/mesh-heading.txt) and
+[mesh-subheading.txt](../../data/mesh-subheading.txt). And also, the human
+genes can be filtered to show the [surface markers][surface_marker].
 
 [immunology]: https://www.ncbi.nlm.nih.gov/pubmed/?term=immunology%5BMeSH+Subheading%5D
 [tumour]: https://www.ncbi.nlm.nih.gov/pubmed/?term=neoplasms%5Bmesh%5D
