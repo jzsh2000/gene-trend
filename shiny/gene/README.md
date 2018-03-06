@@ -28,6 +28,10 @@ Scripting tools:
 
 * GNU [parallel](https://www.gnu.org/software/parallel/)
 
+NCBI toolkit:
+
+* [Entrez Direct](https://www.ncbi.nlm.nih.gov/books/NBK179288/)
+
 R packages:
 
 * [shiny](https://github.com/rstudio/shiny)
