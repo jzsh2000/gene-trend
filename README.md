@@ -1,28 +1,31 @@
 gene-trend
 ==========
 
-This project is designed to answer the following questions:
-
-* [x] Which gene is the hottest in the last year?
-* [x] How does the degree of a gene's hotness change over time?
-* [ ] How is the research on one gene linked to its function?
+This project is aimed to deal with human and mouse gene sets input by user,
+return detailed information about the gene set (synonyms, description, number
+of associated publications et al.)
 
 The origin data are either downloaded from [NCBI FTP site][ncbiftp] or fetched
-using NCBI's [Entrez Direct][edirect] toolkit. Data analysis will be mainly
-performed on the [R][R] programming environment.
+using NCBI's [Entrez Direct][edirect] command line toolkit. Data analysis is
+performed in the [R][R] programming environment.
 
+<!-- Markdown doesn't support FTP link -->
 [ncbiftp]: http://bit.ly/2HJyRfL
 [edirect]: https://www.ncbi.nlm.nih.gov/news/02-06-2014-entrez-direct-released/
 [R]: https://cran.r-project.org/
 
 ---
 
-Two shiny applications are included:
+Currently two shiny applications are included:
 
-gene
-----
-see <https://jzsh2000.shinyapps.io/gene/> \[[source code](shiny/gene)\]
+1. [gene](./shiny/gene/)
 
-gene-trend
-----------
-see <https://jzsh2000.shinyapps.io/gene-trend/> \[[source code](shiny/gene-trend)\]
+    * Match and convert gene information to their standard names
+    * Order gene list by number of associated articles in a specified research
+      domain (e.g. immunology)
+    
+
+2. [gene-trend](./shiny/gene-trend/)
+
+    * Find 10 most studied genes each year
+    * Count number of publications for a specified gene
