@@ -11,6 +11,7 @@ library(shiny)
 suppressMessages(library(shinyjs))
 suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
+suppressMessages(library(glue))
 
 version = readLines('robj/VERSION')
 mesh_list = read_rds('robj/mesh.rds') %>% pull(mesh_term)

@@ -38,7 +38,7 @@ for (species in species_df$short_name) {
 alias_to_id <- function(gene_list, species = 'human') {
     suffix = species_df$suffix[species_df$short_name == species]
     if (!exists(glue('gene_info.{species}'))) {
-        load(glue('robj/{species}.Rdata'))
+        load(glue('robj/{species}.RData'))
     }
 
     data_frame(label = gene_list) %>%
