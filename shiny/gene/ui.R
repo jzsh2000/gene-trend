@@ -39,36 +39,35 @@ shinyUI(fluidPage(
                 sidebarPanel(
                     width = 3,
 
-                    fileInput(
-                        inputId = 'gene_list_file',
-                        label = 'Upload gene list',
-                        accept = 'text/plain'
-                    ),
-                    fluidRow(
-                        column(width = 9,
-                               textAreaInput(
-                                   inputId = 'gene',
-                                   label = "Gene List",
-                                   height = '200px',
-                                   placeholder = 'Your awesome gene list'
-                               )),
-                        column(width = 3,
-                               actionButton(inputId = 'clear', label = 'clear'),
-                               hr(),
-                               actionLink(inputId = 'list1',
-                                          label = tags$span('List 1',
-                                                            class = 'red-box')),
-                               br(),
-                               actionLink(inputId = 'list2',
-                                          label = tags$span('List 2',
-                                                            class = 'blue-box')),
-                               br(),
-                               actionLink(inputId = 'list3',
-                                          label = tags$span('List 3',
-                                                            class = 'green-box')))
-                    ),
+                    conditionalPanel(
+                        'input.output_panel != "database"',
+                        fileInput(
+                            inputId = 'gene_list_file',
+                            label = 'Upload gene list',
+                            accept = 'text/plain'
+                        ),
+                        fluidRow(
+                            column(width = 9,
+                                   textAreaInput(
+                                       inputId = 'gene',
+                                       label = "Gene List",
+                                       height = '200px',
+                                       placeholder = 'Your awesome gene list'
+                                       )
+                                   ),
+                            column(width = 3,
+                                   actionButton(inputId = 'clear', label = 'clear'),
+                                   hr(),
+                                   actionLink(inputId = 'list1', label = tags$span('List 1', class = 'red-box')),
+                                   br(),
+                                   actionLink(inputId = 'list2', label = tags$span('List 2', class = 'blue-box')),
+                                   br(),
+                                   actionLink(inputId = 'list3', label = tags$span('List 3', class = 'green-box'))
+                                   )
+                        ),
 
-                    hr(),
+                        hr()
+                    ),
 
                     selectizeInput(
                         inputId = 'species',
