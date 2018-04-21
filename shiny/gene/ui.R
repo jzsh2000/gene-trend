@@ -46,27 +46,19 @@ shinyUI(fluidPage(
                             label = 'Upload gene list',
                             accept = 'text/plain'
                         ),
-                        fluidRow(
-                            column(width = 9,
-                                   textAreaInput(
-                                       inputId = 'gene',
-                                       label = "Gene List",
-                                       height = '200px',
-                                       placeholder = 'Your awesome gene list'
-                                       )
-                                   ),
-                            column(width = 3,
-                                   actionButton(inputId = 'clear', label = 'clear'),
-                                   hr(),
-                                   actionLink(inputId = 'list1', label = tags$span('List 1', class = 'red-box')),
-                                   br(),
-                                   actionLink(inputId = 'list2', label = tags$span('List 2', class = 'blue-box')),
-                                   br(),
-                                   actionLink(inputId = 'list3', label = tags$span('List 3', class = 'green-box'))
-                                   )
+                        textAreaInput(
+                            inputId = 'gene',
+                            label = "Gene List",
+                            height = '200px',
+                            placeholder = 'Your awesome gene list'
                         ),
-
-                        hr()
+                        fluidRow(
+                            column(width = 3, actionButton(inputId = 'clear', label = 'clear', class = 'btn-warning btn-xs')),
+                            column(width = 3, actionLink(inputId = 'list1', label = tags$span('List 1', class = 'red-box'))),
+                            column(width = 3, actionLink(inputId = 'list2', label = tags$span('List 2', class = 'blue-box'))),
+                            column(width = 3, actionLink(inputId = 'list3', label = tags$span('List 3', class = 'green-box')))
+                        ),
+                     hr()
                     ),
 
                     selectizeInput(
