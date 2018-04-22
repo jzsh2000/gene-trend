@@ -299,12 +299,15 @@ shinyServer(function(input, output, session) {
         gene_list = get_gene_list()
         if (is.null(inFile)) {
             if (length(gene_list) == 0) {
-                return(data_frame('current time' = as.character(Sys.time())))
+                # return(data_frame('current time' = as.character(Sys.time())))
+                return(NULL)
             } else {
                 search.res = get_search_result()[['matched']]
                 return(data_frame(name = gene_list) %>%
                            left_join(search.res, by = "name") %>%
-                           count(type))
+                           count(type) %>%
+                           replace_na(list(type = '-'))
+                       )
             }
         } else {
             print(inFile$datapath)
@@ -312,7 +315,9 @@ shinyServer(function(input, output, session) {
             search.res = get_search_result()[['matched']]
             return(data_frame(name = gene_list) %>%
                        left_join(search.res, by = "name") %>%
-                       count(type))
+                       count(type) %>%
+                       replace_na(list(type = '-'))
+                   )
         }
     })
 

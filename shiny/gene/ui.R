@@ -53,10 +53,10 @@ shinyUI(fluidPage(
                             placeholder = 'Your awesome gene list'
                         ),
                         fluidRow(
-                            column(width = 3, actionButton(inputId = 'clear', label = 'clear', class = 'btn-warning btn-xs')),
                             column(width = 3, actionLink(inputId = 'list1', label = tags$span('List 1', class = 'red-box'))),
                             column(width = 3, actionLink(inputId = 'list2', label = tags$span('List 2', class = 'blue-box'))),
-                            column(width = 3, actionLink(inputId = 'list3', label = tags$span('List 3', class = 'green-box')))
+                            column(width = 3, actionLink(inputId = 'list3', label = tags$span('List 3', class = 'green-box'))),
+                            column(width = 3, actionButton(inputId = 'clear', label = 'clear', class = 'btn-warning btn-xs'))
                         ),
                      hr()
                     ),
