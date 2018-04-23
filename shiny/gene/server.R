@@ -11,6 +11,7 @@ library(shiny)
 suppressMessages(library(shinyjs))
 suppressMessages(library(DT))
 suppressMessages(library(tidyverse))
+suppressMessages(library(magrittr))
 library(htmltools)
 suppressMessages(library(glue))
 
@@ -328,15 +329,20 @@ shinyServer(function(input, output, session) {
                             target=_black>{Symbol}</a>'))
 
         if (input$orderby == 'ncbi') {
-            gene_info = gene_info %>%
-                arrange(order)
+            gene_info %<>% arrange(order)
         } else if (input$orderby == 'pubmed') {
-            gene_info = gene_info %>%
-                arrange(pm_rank)
+            gene_info %<>% arrange(pm_rank)
         } else if (str_detect(input$orderby, '^pubmed_')) {
             mesh_term = str_extract(input$orderby, '(?<=pubmed_).*')
-            gene_info = gene_info %>%
-                arrange_(glue('pm_rank_{mesh_term}'))
+            gene_info %<>% arrange_(glue('pm_rank_{mesh_term}'))
+        }
+
+        if (input$filterby != 'na') {
+            if (input$filterby == 'surface') {
+                gene_info %<>% semi_join(surface_marker, by = 'GeneID')
+            } else if (input$filterby == 'cd') {
+                gene_info %<>% semi_join(cd_molecules, by = 'GeneID')
+            }
         }
 
         gene_info %>%
